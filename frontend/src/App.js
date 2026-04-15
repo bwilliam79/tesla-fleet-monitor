@@ -66,11 +66,6 @@ function AppContent() {
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
       <div className="app-header">
         <div className="header-title">
-          <span className="header-title-logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3.14.69 4.22 1.78L5.78 16.22C4.69 15.14 4 13.66 4 12c0-4.42 3.58-8 8-8zm0 14c-1.66 0-3.14-.69-4.22-1.78l10.44-10.44C19.31 8.86 20 10.34 20 12c0 4.42-3.58 8-8 8z"/>
-            </svg>
-          </span>
           Tesla Fleet Monitor
         </div>
         <div className="header-status">
