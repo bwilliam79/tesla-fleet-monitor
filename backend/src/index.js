@@ -148,8 +148,7 @@ app.get('/api/fleet/stats', (req, res) => {
        ROUND(AVG(m.battery_range_km), 1) as avg_range,
        SUM(CASE WHEN m.charging_state = 'Charging' THEN 1 ELSE 0 END) as charging_count
      FROM vehicles v
-     LEFT JOIN metrics m ON v.id = m.vehicle_id
-     WHERE m.timestamp = (SELECT MAX(timestamp) FROM metrics)`,
+     LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)`,
     (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(rows?.[0] || {});
