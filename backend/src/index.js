@@ -99,6 +99,30 @@ app.get('/api/vehicles/:vehicleId/trips', (req, res) => {
   );
 });
 
+// Get daily stats (efficiency + energy) from trips for charts
+app.get('/api/vehicles/:vehicleId/daily-stats', (req, res) => {
+  const days = parseInt(req.query.days) || 30;
+  const cutoff = Math.floor(Date.now() / 1000) - (days * 24 * 3600);
+
+  db.all(
+    `SELECT
+       date(start_time, 'unixepoch') as day,
+       ROUND(AVG(efficiency_wh_per_mi), 1) as avg_efficiency,
+       ROUND(SUM(energy_used_kwh), 2) as total_energy_kwh,
+       ROUND(SUM(distance_mi), 1) as total_distance_mi,
+       COUNT(*) as trip_count
+     FROM trips
+     WHERE vehicle_id = ? AND start_time >= ? AND efficiency_wh_per_mi IS NOT NULL
+     GROUP BY date(start_time, 'unixepoch')
+     ORDER BY day ASC`,
+    [req.params.vehicleId, cutoff],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows || []);
+    }
+  );
+});
+
 // Get efficiency leaderboard (monthly average from trip data)
 app.get('/api/leaderboard/efficiency', (req, res) => {
   const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 3600);
