@@ -7,8 +7,8 @@ function VehicleCard({ vehicle, onClick }) {
   const rangeMiles = formatRangeMetric(vehicle.battery_range_mi || 0);
   const status = vehicle.charging_state || 'Idle';
   const isCharging = status === 'Charging';
-  const chargeRateKw = isCharging && vehicle.power_kw != null
-    ? Math.abs(vehicle.power_kw).toFixed(1)
+  const chargeRateKw = isCharging && vehicle.power_kw > 0
+    ? vehicle.power_kw.toFixed(1)
     : null;
 
   const getStatusBadge = (status) => {
