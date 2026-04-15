@@ -6,6 +6,10 @@ function VehicleCard({ vehicle, onClick }) {
   const soc = vehicle.state_of_charge || 0;
   const rangeMiles = formatRangeMetric(vehicle.battery_range_mi || 0);
   const status = vehicle.charging_state || 'Idle';
+  const isCharging = status === 'Charging';
+  const chargeRateKw = isCharging && vehicle.power_kw != null
+    ? Math.abs(vehicle.power_kw).toFixed(1)
+    : null;
 
   const getStatusBadge = (status) => {
     let className = 'badge ';
@@ -21,7 +25,14 @@ function VehicleCard({ vehicle, onClick }) {
           <h3 className="vehicle-name">{vehicle.name}</h3>
           <p className="vehicle-model">{vehicle.year} {vehicle.model}</p>
         </div>
-        <span className={getStatusBadge(status)}>{status}</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+          <span className={getStatusBadge(status)}>{status}</span>
+          {chargeRateKw && (
+            <span style={{ fontSize: '0.75rem', color: '#00E676', fontFamily: 'JetBrains Mono, monospace' }}>
+              {chargeRateKw} kW
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="battery-gauge">
