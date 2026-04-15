@@ -62,26 +62,38 @@ const TessieService = {
         const existing = await this.dbGet(db, 'SELECT id FROM vehicles WHERE vin = ?', [vehicle.vin]);
         const vehicleId = existing ? existing.id : uuidv4();
 
-        // Insert or update vehicle
+        // Insert or update vehicle (Tessie doesn't provide model/year, so we'll use display_name)
         await this.dbRun(
           db,
           `INSERT OR REPLACE INTO vehicles (id, name, vin, model, color, year)
            VALUES (?, ?, ?, ?, ?, ?)`,
           [
             vehicleId,
-            vehicle.name || vehicle.vin,
+            vehicle.display_name || vehicle.vin,
             vehicle.vin,
-            vehicle.model,
-            vehicle.color,
-            vehicle.year,
+            vehicle.vehicle_config?.model || 'Unknown',
+            vehicle.color || 'Unknown',
+            null,  // Tessie doesn't provide year
           ]
         );
 
-        // Get historical metrics
+        // Get historical metrics/states
         const history = await client.getVehicleHistory(vehicle.vin);
 
-        // Insert metrics
-        for (const metric of history) {
+        // Insert metrics (Tessie provides battery_level, battery_range, power, inside_temp, etc.)
+        for (const state of history) {
+          // Tessie provides power in kW directly
+          const powerKw = state.power ? state.power / 1000 : null;
+          const insideTemp = state.inside_temp || null;
+
+          // Determine charging state from the state field
+          let chargingState = 'Idle';
+          if (state.charging_state === 'Charging') {
+            chargingState = 'Charging';
+          } else if (state.state === 'driving') {
+            chargingState = 'Discharging';
+          }
+
           await this.dbRun(
             db,
             `INSERT OR IGNORE INTO metrics
@@ -92,23 +104,29 @@ const TessieService = {
             [
               uuidv4(),
               vehicleId,
-              Math.floor(new Date(metric.created_at).getTime() / 1000),
-              metric.state_of_charge,
-              metric.battery_range_km,
-              metric.odometer_km,
-              metric.efficiency_wh_per_km,
-              metric.temperature_celsius,
-              metric.charging_state,
-              metric.power_kw,
+              state.timestamp,
+              state.battery_level,
+              state.battery_range,
+              state.odometer,
+              null,  // Efficiency not available from individual states
+              insideTemp,
+              chargingState,
+              powerKw,
             ]
           );
         }
 
-        // Get trip history
-        const trips = await client.getVehicleTrips(vehicle.vin, 90);
+        // Get trip history (called "drives" in Tessie)
+        const drives = await client.getVehicleTrips(vehicle.vin, 90);
 
-        // Insert trips
-        for (const trip of trips) {
+        // Insert trips (Tessie provides drives with energy and distance data)
+        for (const drive of drives) {
+          // Calculate efficiency: Wh/km = (kWh * 1000) / km
+          let efficiencyWhPerKm = null;
+          if (drive.energy_used && drive.odometer_distance && drive.odometer_distance > 0) {
+            efficiencyWhPerKm = (drive.energy_used * 1000) / drive.odometer_distance;
+          }
+
           await this.dbRun(
             db,
             `INSERT OR IGNORE INTO trips
@@ -118,13 +136,13 @@ const TessieService = {
             [
               uuidv4(),
               vehicleId,
-              Math.floor(new Date(trip.start_time).getTime() / 1000),
-              trip.end_time ? Math.floor(new Date(trip.end_time).getTime() / 1000) : null,
-              trip.start_location,
-              trip.end_location,
-              trip.distance_km,
-              trip.energy_used_kwh,
-              trip.efficiency_wh_per_km,
+              drive.started_at,
+              drive.ended_at || null,
+              drive.starting_location,
+              drive.ending_location,
+              drive.odometer_distance,
+              drive.energy_used,
+              efficiencyWhPerKm,
             ]
           );
         }
