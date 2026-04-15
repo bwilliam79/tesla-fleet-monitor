@@ -50,7 +50,7 @@ function VehicleDetail({ vehicleId, onBack }) {
         <div className="detail-header">
           <button className="back-button" onClick={onBack}>← Back to Fleet</button>
           <h1>{vehicle.name}</h1>
-          <p className="vehicle-meta">{vehicle.year} {vehicle.color}</p>
+          <p className="vehicle-meta">{vehicle.vin}</p>
         </div>
 
         <div className="detail-grid">
