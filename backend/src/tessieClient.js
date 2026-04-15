@@ -78,7 +78,16 @@ class TessieClient {
     const now = Math.floor(Date.now() / 1000);
     const from = now - (days * 24 * 3600);
     const response = await this.request(`/${vin}/drives?from=${from}&to=${now}`);
-    return response.response || response.results || [];
+    if (Array.isArray(response)) return response;
+    if (response.results) {
+      if (Array.isArray(response.results)) return response.results;
+      // If results is an object with keys, convert to array
+      if (typeof response.results === 'object') {
+        return Object.values(response.results);
+      }
+    }
+    if (Array.isArray(response.response)) return response.response;
+    return [];
   }
 }
 
