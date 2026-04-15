@@ -58,7 +58,8 @@ class TessieClient {
   async getVehicleHistory(vin, days = 7) {
     const now = Math.floor(Date.now() / 1000);
     const from = now - (days * 24 * 3600);
-    const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=1`);
+    // Use interval=60 (1 minute) to stay under 10000 data point limit for 7 days
+    const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=60`);
     return response.response || response.results || [];
   }
 
