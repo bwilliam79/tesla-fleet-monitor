@@ -3,7 +3,6 @@
   --bg:            #070A14;
   --bg-surface:    rgba(0, 212, 255, 0.03);
   --bg-surface-md: rgba(0, 212, 255, 0.06);
-  --bg-surface-hi: rgba(0, 212, 255, 0.10);
   --border:        rgba(0, 212, 255, 0.14);
   --border-hover:  rgba(0, 212, 255, 0.40);
   --border-active: rgba(0, 212, 255, 0.70);
@@ -45,10 +44,6 @@
 @keyframes fadeOutComplete {
   0%   { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(0.95); }
-}
-@keyframes scanMove {
-  from { background-position: 0 0; }
-  to   { background-position: 0 100%; }
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────────────── */
