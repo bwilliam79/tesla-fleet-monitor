@@ -296,18 +296,16 @@ const server = app.listen(PORT, async () => {
     apiKeyConfig = savedApiKey;
     console.log('Loaded API key from database');
 
-    // Clear any mock data before attempting import
-    if (!importComplete) {
-      console.log('Clearing mock data and reattempting Tessie import...');
-      db.run('DELETE FROM metrics');
-      db.run('DELETE FROM trips');
-      db.run('DELETE FROM vehicles');
-      TessieService.importTessieData(apiKeyConfig, db).catch(err => {
-        console.error('Tessie import error on startup:', err);
-      });
-    } else {
-      console.log('Tessie import already complete');
-    }
+    // Always check if we should attempt import
+    // Reset the completion flag and clear old data, then retry
+    console.log('Clearing database and retrying Tessie import...');
+    await setConfigValue('tessie_import_complete', 'false');
+    db.run('DELETE FROM metrics');
+    db.run('DELETE FROM trips');
+    db.run('DELETE FROM vehicles');
+    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
+      console.error('Tessie import error on startup:', err);
+    });
   } else {
     // Only initialize mock data if no API key is configured
     console.log('No API key found, initializing mock data');
