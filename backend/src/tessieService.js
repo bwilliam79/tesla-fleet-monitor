@@ -90,8 +90,8 @@ const TessieService = {
           ]
         );
 
-        // Get historical metrics/states (using vehicle.id, not vin)
-        const history = await client.getVehicleHistory(vehicle.id);
+        // Get historical metrics/states (using vehicle.vin)
+        const history = await client.getVehicleHistory(vehicle.vin);
 
         // Insert metrics (Tessie provides battery_level, battery_range, power, inside_temp, etc.)
         for (const state of history) {
@@ -129,8 +129,8 @@ const TessieService = {
           );
         }
 
-        // Get trip history (called "drives" in Tessie, using vehicle.id)
-        const drives = await client.getVehicleTrips(vehicle.id, 90);
+        // Get trip history (called "drives" in Tessie, using vehicle.vin)
+        const drives = await client.getVehicleTrips(vehicle.vin, 90);
 
         // Insert trips (Tessie provides drives with energy and distance data)
         for (const drive of drives) {
