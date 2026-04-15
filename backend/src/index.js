@@ -57,8 +57,7 @@ app.get('/api/vehicles', (req, res) => {
   db.all(
     `SELECT v.*, m.state_of_charge, m.battery_range_km, m.charging_state, m.timestamp
      FROM vehicles v
-     LEFT JOIN metrics m ON v.id = m.vehicle_id
-     WHERE m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)
+     LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)
      ORDER BY v.name`,
     (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });

@@ -62,8 +62,13 @@ const TessieService = {
       let vehicleCount = 0;
       const totalVehicles = vehicles.length;
 
-      // Step 2: Import each vehicle and its data
+      // Step 2: Import each vehicle and its data (skip archived vehicles)
       for (const vehicle of vehicles) {
+        // Skip archived vehicles
+        if (vehicle.is_archived_manually) {
+          console.log(`Skipping archived vehicle: ${vehicle.display_name || vehicle.vin}`);
+          continue;
+        }
         vehicleCount++;
         importProgress = {
           status: 'importing_vehicle_data',
