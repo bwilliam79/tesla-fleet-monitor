@@ -198,12 +198,15 @@ app.post('/api/config/api-key', (req, res) => {
     return res.status(400).json({ error: 'API key is required' });
   }
 
+  const isFirstTimeSetup = !apiKeyConfig;
   apiKeyConfig = apiKey.trim();
 
-  // Clear mock data when API key is added
-  db.run('DELETE FROM metrics');
-  db.run('DELETE FROM trips');
-  db.run('DELETE FROM vehicles');
+  // Only clear data on first setup, not on re-setting the key
+  if (isFirstTimeSetup) {
+    db.run('DELETE FROM metrics');
+    db.run('DELETE FROM trips');
+    db.run('DELETE FROM vehicles');
+  }
 
   // Start importing Tessie data asynchronously
   setImmediate(() => {
@@ -212,7 +215,7 @@ app.post('/api/config/api-key', (req, res) => {
     });
   });
 
-  res.json({ message: 'API key configured. Clearing mock data and starting Tessie import...' });
+  res.json({ message: 'API key configured. Starting Tessie data import...' });
 });
 
 // Get import progress
