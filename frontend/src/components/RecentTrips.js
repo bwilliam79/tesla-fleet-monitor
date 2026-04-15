@@ -54,9 +54,9 @@ function RecentTrips() {
                 {trip.start_location} → {trip.end_location}
               </div>
               <div className="trip-stats">
-                <span>{trip.distance_mi.toFixed(1)} mi</span>
+                <span>{trip.distance_mi ? trip.distance_mi.toFixed(1) : 'N/A'} mi</span>
                 <span>•</span>
-                <span>{trip.efficiency_wh_per_mi.toFixed(0)} Wh/mi</span>
+                <span>{trip.efficiency_wh_per_mi ? trip.efficiency_wh_per_mi.toFixed(0) : 'N/A'} Wh/mi</span>
               </div>
             </div>
           </div>
