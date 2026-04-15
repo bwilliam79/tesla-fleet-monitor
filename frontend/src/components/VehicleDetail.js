@@ -59,12 +59,12 @@ function VehicleDetail({ vehicleId, onBack }) {
             {metrics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="timestamp" stroke="#707070" />
-                  <YAxis stroke="#707070" />
-                  <Tooltip contentStyle={{ background: 'rgba(10, 14, 39, 0.9)', border: '1px solid rgba(255,255,255,0.2)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
+                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <YAxis stroke="#2D4A58" />
+                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
                   <Legend />
-                  <Line type="monotone" dataKey="state_of_charge" stroke="#3b82f6" name="SOC (%)" dot={false} />
+                  <Line type="monotone" dataKey="state_of_charge" stroke="#00D4FF" name="SOC (%)" dot={false} strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -77,12 +77,12 @@ function VehicleDetail({ vehicleId, onBack }) {
             {metrics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="timestamp" stroke="#707070" />
-                  <YAxis stroke="#707070" />
-                  <Tooltip contentStyle={{ background: 'rgba(10, 14, 39, 0.9)', border: '1px solid rgba(255,255,255,0.2)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
+                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <YAxis stroke="#2D4A58" />
+                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
                   <Legend />
-                  <Line type="monotone" dataKey="efficiency_wh_per_mi" stroke="#4caf50" name="Wh/mi" dot={false} />
+                  <Line type="monotone" dataKey="efficiency_wh_per_mi" stroke="#00E676" name="Wh/mi" dot={false} strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -95,12 +95,12 @@ function VehicleDetail({ vehicleId, onBack }) {
             {metrics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="timestamp" stroke="#707070" />
-                  <YAxis stroke="#707070" />
-                  <Tooltip contentStyle={{ background: 'rgba(10, 14, 39, 0.9)', border: '1px solid rgba(255,255,255,0.2)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
+                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <YAxis stroke="#2D4A58" />
+                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
                   <Legend />
-                  <Bar dataKey="battery_range_mi" fill="#3b82f6" name="Range (mi)" />
+                  <Bar dataKey="battery_range_mi" fill="rgba(0,212,255,0.6)" name="Range (mi)" radius={[3,3,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -113,12 +113,12 @@ function VehicleDetail({ vehicleId, onBack }) {
             {metrics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={metrics}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis dataKey="timestamp" stroke="#707070" />
-                  <YAxis stroke="#707070" />
-                  <Tooltip contentStyle={{ background: 'rgba(10, 14, 39, 0.9)', border: '1px solid rgba(255,255,255,0.2)' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
+                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <YAxis stroke="#2D4A58" />
+                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
                   <Legend />
-                  <Line type="monotone" dataKey="power_kw" stroke="#ff9800" name="Power (kW)" dot={false} />
+                  <Line type="monotone" dataKey="power_kw" stroke="#FFB300" name="Power (kW)" dot={false} strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (

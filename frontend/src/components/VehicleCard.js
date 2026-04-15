@@ -30,7 +30,12 @@ function VehicleCard({ vehicle, onClick }) {
             className="gauge-fill"
             style={{
               width: `${soc}%`,
-              background: soc > 70 ? '#4caf50' : soc > 40 ? '#ffc107' : '#E82127'
+              background: soc > 70
+                ? 'linear-gradient(90deg, #00B894, #00E676)'
+                : soc > 40
+                  ? 'linear-gradient(90deg, #E6A817, #FFB300)'
+                  : 'linear-gradient(90deg, #C0171C, #E82127)',
+              color: soc > 70 ? '#00E676' : soc > 40 ? '#FFB300' : '#E82127'
             }}
           />
         </div>

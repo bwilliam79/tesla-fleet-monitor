@@ -3,32 +3,56 @@
   padding: 2rem 0;
 }
 
+/* ─── Header ───────────────────────────────────────── */
 .detail-header {
   margin-bottom: 2rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.detail-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
 }
 
 .back-button {
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .detail-header h1 {
-  margin: 0.5rem 0 0.25rem 0;
+  margin: 0.5rem 0 0.3rem 0;
+  font-size: 1.4rem;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.25);
 }
 
 .vehicle-meta {
-  color: #a0a0a0;
-  font-size: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
   margin: 0;
 }
 
+/* ─── Chart grid ───────────────────────────────────── */
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .detail-grid .card {
@@ -38,50 +62,56 @@
 
 .detail-grid h3 {
   margin-top: 0;
+  margin-bottom: 1.25rem;
 }
 
+/* ─── Trips table ──────────────────────────────────── */
 .trips-table {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
 }
 
 .trips-header,
 .trips-row {
   display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr;
+  grid-template-columns: 2fr 1.25fr 1.25fr 1.25fr;
   gap: 1rem;
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   align-items: center;
 }
 
 .trips-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.35rem;
+  font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
-  color: #a0a0a0;
-  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
 }
 
 .trips-row {
-  padding: 1rem;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.02);
-  transition: background 0.2s ease;
-  margin-bottom: 0.5rem;
+  background: var(--bg-surface);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: var(--transition);
+  margin-bottom: 0.35rem;
 }
 
 .trips-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface-md);
+  border-color: var(--border);
 }
 
 .trips-row div {
-  font-size: 0.95rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .col-date {
-  font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 0.9rem;
+  color: var(--text-primary) !important;
+  font-size: 0.8rem !important;
 }
 
 .col-distance,
@@ -89,8 +119,10 @@
 .col-energy {
   text-align: right;
   font-weight: 500;
+  color: var(--cyan) !important;
 }
 
+/* ─── Responsive ───────────────────────────────────── */
 @media (max-width: 1200px) {
   .detail-grid {
     grid-template-columns: 1fr;
@@ -108,13 +140,13 @@
   }
 
   .detail-grid {
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .trips-header,
   .trips-row {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .col-date,
@@ -135,9 +167,11 @@
   .trips-row div::before {
     content: attr(data-label);
     font-weight: 600;
-    font-size: 0.75rem;
-    color: #707070;
+    font-size: 0.68rem;
+    color: var(--text-muted);
     display: block;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 }
