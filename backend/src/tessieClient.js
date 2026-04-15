@@ -56,13 +56,25 @@ class TessieClient {
   }
 
   async getVehicleHistory(vin, days = 7) {
-    const response = await this.request(`/api/1/vehicles/${vin}/history?days=${days}`);
-    return response.response || response.results || [];
+    try {
+      const response = await this.request(`/api/1/vehicles/${vin}/history?days=${days}`);
+      return response.response || response.results || [];
+    } catch (err) {
+      console.log('History endpoint failed, trying states:', err.message);
+      const response = await this.request(`/api/1/vehicles/${vin}/states?days=${days}`);
+      return response.response || response.results || [];
+    }
   }
 
   async getVehicleTrips(vin, days = 90) {
-    const response = await this.request(`/api/1/vehicles/${vin}/drives?days=${days}`);
-    return response.response || response.results || [];
+    try {
+      const response = await this.request(`/api/1/vehicles/${vin}/drives?days=${days}`);
+      return response.response || response.results || [];
+    } catch (err) {
+      console.log('Drives endpoint failed, trying trips:', err.message);
+      const response = await this.request(`/api/1/vehicles/${vin}/trips?days=${days}`);
+      return response.response || response.results || [];
+    }
   }
 }
 
