@@ -1,7 +1,10 @@
 import React from 'react';
+import { kmToMiles } from '../utils';
 import './FleetStats.css';
 
 function FleetStats({ stats }) {
+  const avgRangeMiles = Math.round(kmToMiles(stats.avg_range || 0));
+
   return (
     <div className="fleet-stats">
       <div className="stat-card card">
@@ -13,8 +16,8 @@ function FleetStats({ stats }) {
         <div className="stat-label">Avg. Battery</div>
       </div>
       <div className="stat-card card">
-        <div className="stat-value">{Math.round(stats.avg_range || 0)}</div>
-        <div className="stat-label">Avg. Range (km)</div>
+        <div className="stat-value">{avgRangeMiles}</div>
+        <div className="stat-label">Avg. Range (mi)</div>
       </div>
       <div className="stat-card card">
         <div className="stat-value">{stats.charging_count || 0}</div>
