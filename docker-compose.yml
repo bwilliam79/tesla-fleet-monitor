@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  tesla-monitor:
+    build: .
+    container_name: tesla-fleet-monitor
+    ports:
+      - "3000:3001"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    restart: unless-stopped

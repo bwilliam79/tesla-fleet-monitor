@@ -1,0 +1,86 @@
+.recent-trips {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-trips h3 {
+  margin: 0;
+}
+
+.recent-trips .subtitle {
+  color: #707070;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.trips-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.trip-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  border-left: 3px solid rgba(59, 130, 246, 0.3);
+  transition: background 0.2s ease;
+}
+
+.trip-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.trip-time {
+  flex-shrink: 0;
+}
+
+.time-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #60a5fa;
+  white-space: nowrap;
+}
+
+.trip-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.trip-vehicle {
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
+}
+
+.trip-route {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trip-stats {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #707070;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #707070;
+  font-size: 0.95rem;
+}

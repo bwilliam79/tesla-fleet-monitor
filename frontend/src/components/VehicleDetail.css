@@ -1,0 +1,143 @@
+.vehicle-detail {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.detail-header {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-button {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.detail-header h1 {
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.vehicle-meta {
+  color: #a0a0a0;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.detail-grid .card {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-grid h3 {
+  margin-top: 0;
+}
+
+.trips-table {
+  margin-top: 1rem;
+}
+
+.trips-header,
+.trips-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+}
+
+.trips-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #a0a0a0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trips-row {
+  padding: 1rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: background 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.trips-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.trips-row div {
+  font-size: 0.95rem;
+}
+
+.col-date {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.col-distance,
+.col-efficiency,
+.col-energy {
+  text-align: right;
+  font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .trips-header,
+  .trips-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .vehicle-detail {
+    padding: 1rem 0;
+  }
+
+  .detail-grid {
+    gap: 1.5rem;
+  }
+
+  .trips-header,
+  .trips-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .col-date,
+  .col-distance,
+  .col-efficiency,
+  .col-energy {
+    text-align: left;
+  }
+
+  .trips-header {
+    display: none;
+  }
+
+  .trips-row {
+    padding: 0.75rem;
+  }
+
+  .trips-row div::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #707070;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+}
