@@ -132,7 +132,7 @@ h3 {
 }
 
 .status-text.import-progress {
-  color: #E82127;
+  color: #909090;
   animation: pulse 1.5s ease-in-out infinite;
 }
 

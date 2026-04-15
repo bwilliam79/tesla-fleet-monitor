@@ -45,22 +45,22 @@ class TessieClient {
   }
 
   async getVehicles() {
-    const response = await this.request('/vehicles');
+    const response = await this.request('/api/v1/vehicles');
     return response.results || [];
   }
 
   async getVehicleData(vin) {
-    const response = await this.request(`/vehicles/${vin}/state`);
+    const response = await this.request(`/api/v1/vehicles/${vin}/state`);
     return response;
   }
 
   async getVehicleHistory(vin) {
-    const response = await this.request(`/vehicles/${vin}/history?days=7`);
+    const response = await this.request(`/api/v1/vehicles/${vin}/history?days=7`);
     return response.results || [];
   }
 
   async getVehicleTrips(vin, days = 90) {
-    const response = await this.request(`/vehicles/${vin}/trips?days=${days}`);
+    const response = await this.request(`/api/v1/vehicles/${vin}/trips?days=${days}`);
     return response.results || [];
   }
 }
