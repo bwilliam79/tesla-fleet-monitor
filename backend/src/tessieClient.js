@@ -59,14 +59,11 @@ class TessieClient {
     const now = Math.floor(Date.now() / 1000);
     const from = now - (days * 24 * 3600);
     // Use interval=120 (2 minutes) to stay under 10000 data point limit
-    const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=120`);
+    // Don't use condense - we need full objects with all fields
+    const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=120&condense=false`);
     if (Array.isArray(response)) return response;
     if (response.results) {
       if (Array.isArray(response.results)) return response.results;
-      // If results is an object with timestamp keys, convert to array
-      if (typeof response.results === 'object') {
-        return Object.values(response.results);
-      }
     }
     if (Array.isArray(response.response)) return response.response;
     return [];
@@ -79,10 +76,6 @@ class TessieClient {
     if (Array.isArray(response)) return response;
     if (response.results) {
       if (Array.isArray(response.results)) return response.results;
-      // If results is an object with keys, convert to array
-      if (typeof response.results === 'object') {
-        return Object.values(response.results);
-      }
     }
     if (Array.isArray(response.response)) return response.response;
     return [];
