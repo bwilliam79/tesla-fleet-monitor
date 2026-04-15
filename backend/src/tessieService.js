@@ -94,6 +94,7 @@ const TessieService = {
         if (vehicle.last_state?.vehicle_state?.exterior_color) {
           color = vehicle.last_state.vehicle_state.exterior_color;
         }
+        console.log(`Color extraction for ${displayName}: vehicle_state=${JSON.stringify(vehicle.last_state?.vehicle_state ? Object.keys(vehicle.last_state.vehicle_state) : 'null')}, exterior_color=${vehicle.last_state?.vehicle_state?.exterior_color}, final color=${color}`);
 
         // Insert or update vehicle
         await this.dbRun(
