@@ -43,6 +43,53 @@ const TessieService = {
     });
   },
 
+  async pollCurrentState(apiKey, db) {
+    try {
+      const client = new TessieClient(apiKey);
+      const vehicles = await client.getVehicles();
+
+      for (const vehicle of vehicles) {
+        if (!vehicle.is_active) continue;
+
+        const row = await this.dbGet(db, 'SELECT id FROM vehicles WHERE vin = ?', [vehicle.vin]);
+        if (!row) continue;
+
+        const state = vehicle.last_state || {};
+        const chargeState = state.charge_state || {};
+
+        // Tessie condenses some fields directly onto last_state; fall back to nested charge_state
+        const soc = state.battery_level ?? chargeState.battery_level ?? null;
+        const range = state.battery_range ?? chargeState.battery_range ?? null;
+        const chargingStateRaw = state.charging_state ?? chargeState.charging_state ?? null;
+        const insideTemp = state.inside_temp ?? null;
+        const odometer = state.odometer ?? state.vehicle_state?.odometer ?? null;
+
+        // charger_power (kW) is the AC charge rate; fall back to raw power field
+        const powerKw = chargeState.charger_power != null
+          ? chargeState.charger_power
+          : (state.power != null ? state.power / 1000 : null);
+
+        let chargingState = 'Idle';
+        if (chargingStateRaw === 'Charging') chargingState = 'Charging';
+        else if (state.state === 'driving') chargingState = 'Discharging';
+
+        const timestamp = Math.floor(Date.now() / 1000);
+
+        await this.dbRun(
+          db,
+          `INSERT OR IGNORE INTO metrics
+           (id, vehicle_id, timestamp, state_of_charge, battery_range_mi,
+            odometer_mi, efficiency_wh_per_mi, temperature_celsius,
+            charging_state, power_kw)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [uuidv4(), row.id, timestamp, soc, range, odometer, null, insideTemp, chargingState, powerKw]
+        );
+      }
+    } catch (err) {
+      console.error('pollCurrentState error:', err.message);
+    }
+  },
+
   async importTessieData(apiKey, db) {
     importProgress = { status: 'starting', message: 'Initializing import...' };
 

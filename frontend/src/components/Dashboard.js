@@ -32,7 +32,7 @@ function Dashboard({ onViewVehicle }) {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 15 * 60 * 1000);
+    const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 

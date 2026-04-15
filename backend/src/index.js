@@ -38,7 +38,7 @@ let apiKeyConfig = null;
 // Get all vehicles with latest metrics
 app.get('/api/vehicles', (req, res) => {
   db.all(
-    `SELECT v.*, m.state_of_charge, m.battery_range_mi, m.charging_state, m.timestamp
+    `SELECT v.*, m.state_of_charge, m.battery_range_mi, m.charging_state, m.power_kw, m.timestamp
      FROM vehicles v
      LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)
      ORDER BY v.name`,
@@ -205,16 +205,17 @@ app.post('/api/config/api-key', (req, res) => {
   apiKeyConfig = apiKey.trim();
   saveApiKey(apiKeyConfig);
 
-  // Clear existing vehicle data before fresh import
+  if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
   db.run('DELETE FROM metrics');
   db.run('DELETE FROM trips');
   db.run('DELETE FROM vehicles');
+  db.run("DELETE FROM config WHERE key = 'tessie_import_complete'");
 
   TessieService.clearImportProgress();
   setImmediate(() => {
-    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
-      console.error('Tessie import error:', err);
-    });
+    TessieService.importTessieData(apiKeyConfig, db)
+      .then(() => startPolling())
+      .catch(err => console.error('Tessie import error:', err));
   });
 
   res.json({ message: 'API key saved. Starting Tessie data import...' });
@@ -226,15 +227,17 @@ app.post('/api/config/wipe-and-reimport', (req, res) => {
     return res.status(400).json({ error: 'No API key configured' });
   }
 
+  if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
   db.run('DELETE FROM metrics');
   db.run('DELETE FROM trips');
   db.run('DELETE FROM vehicles');
+  db.run("DELETE FROM config WHERE key = 'tessie_import_complete'");
 
   TessieService.clearImportProgress();
   setImmediate(() => {
-    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
-      console.error('Tessie reimport error:', err);
-    });
+    TessieService.importTessieData(apiKeyConfig, db)
+      .then(() => startPolling())
+      .catch(err => console.error('Tessie reimport error:', err));
   });
 
   res.json({ message: 'Database wiped. Reimporting from Tessie...' });
@@ -251,6 +254,21 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(frontendBuildPath, 'index.html'));
 });
 
+let pollingInterval = null;
+
+function startPolling() {
+  if (pollingInterval) clearInterval(pollingInterval);
+  pollingInterval = setInterval(async () => {
+    if (apiKeyConfig) {
+      await TessieService.pollCurrentState(apiKeyConfig, db);
+    }
+  }, 60 * 1000);
+  // Run immediately on start too
+  if (apiKeyConfig) {
+    TessieService.pollCurrentState(apiKeyConfig, db);
+  }
+}
+
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
   console.log(`Tesla Fleet Monitor API running on port ${PORT}`);
@@ -258,13 +276,17 @@ const server = app.listen(PORT, () => {
   apiKeyConfig = loadApiKey();
 
   if (apiKeyConfig) {
-    console.log('API key loaded from file. Starting Tessie import...');
-    TessieService.clearImportProgress();
-    db.run('DELETE FROM metrics');
-    db.run('DELETE FROM trips');
-    db.run('DELETE FROM vehicles');
-    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
-      console.error('Tessie import error on startup:', err);
+    db.get("SELECT value FROM config WHERE key = 'tessie_import_complete'", (err, row) => {
+      if (!err && row?.value === 'true') {
+        console.log('Prior import found — skipping reimport, starting poller.');
+        startPolling();
+      } else {
+        console.log('No prior import found. Running initial Tessie import...');
+        TessieService.clearImportProgress();
+        TessieService.importTessieData(apiKeyConfig, db)
+          .then(() => startPolling())
+          .catch(err => console.error('Tessie import error on startup:', err));
+      }
     });
   } else {
     console.log('No API key configured. Add your Tessie API key in Settings.');
