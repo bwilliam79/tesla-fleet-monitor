@@ -23,25 +23,8 @@
   flex-direction: column;
   gap: 0.65rem;
   flex: 1;
-  position: relative;
 }
 
-/* vertical connector line */
-.trips-timeline::before {
-  content: '';
-  position: absolute;
-  top: 8px;
-  bottom: 8px;
-  left: 46px;
-  width: 1px;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    var(--border) 15%,
-    var(--border) 85%,
-    transparent
-  );
-}
 
 .trip-item {
   display: flex;
