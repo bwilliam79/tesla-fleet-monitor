@@ -99,10 +99,12 @@ const TessieService = {
         } else if (vehicle.exterior_color) {
           color = vehicle.exterior_color;
         }
-        // Clean up color name by removing "ExteriorColor" prefix if present
+        // Clean up color name by removing "ExteriorColor" prefix and adding spaces before capitals
         if (color.startsWith('ExteriorColor')) {
           color = color.replace('ExteriorColor', '');
         }
+        // Add spaces before capital letters (e.g., PearlWhite → Pearl White)
+        color = color.replace(/([a-z])([A-Z])/g, '$1 $2');
 
         // Insert or update vehicle
         await this.dbRun(
