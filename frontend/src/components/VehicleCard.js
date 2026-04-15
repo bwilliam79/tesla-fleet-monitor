@@ -1,5 +1,5 @@
 import React from 'react';
-import { kmToMiles, formatRangeMetric } from '../utils';
+import { formatRangeMetric } from '../utils';
 import './VehicleCard.css';
 
 function VehicleCard({ vehicle, onClick }) {
