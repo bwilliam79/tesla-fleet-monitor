@@ -200,6 +200,11 @@ app.post('/api/config/api-key', (req, res) => {
 
   apiKeyConfig = apiKey.trim();
 
+  // Clear mock data when API key is added
+  db.run('DELETE FROM metrics');
+  db.run('DELETE FROM trips');
+  db.run('DELETE FROM vehicles');
+
   // Start importing Tessie data asynchronously
   setImmediate(() => {
     TessieService.importTessieData(apiKeyConfig, db).catch(err => {
@@ -207,7 +212,7 @@ app.post('/api/config/api-key', (req, res) => {
     });
   });
 
-  res.json({ message: 'API key configured. Starting Tessie data import...' });
+  res.json({ message: 'API key configured. Clearing mock data and starting Tessie import...' });
 });
 
 // Get import progress

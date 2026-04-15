@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { formatDistancePrecise } from '../utils';
+import { formatDistancePrecise, whPerKmToWhPerMi } from '../utils';
 import './VehicleDetail.css';
 
 function VehicleDetail({ vehicleId, onBack }) {
@@ -26,7 +26,8 @@ function VehicleDetail({ vehicleId, onBack }) {
           timestamp: new Date(m.timestamp * 1000).toLocaleTimeString('en-US', {
             hour: '2-digit',
             minute: '2-digit'
-          })
+          }),
+          efficiency_wh_per_mi: whPerKmToWhPerMi(m.efficiency_wh_per_km)
         })));
         setTrips(tripsRes.data);
       } catch (err) {
@@ -83,7 +84,7 @@ function VehicleDetail({ vehicleId, onBack }) {
                   <YAxis stroke="#707070" />
                   <Tooltip contentStyle={{ background: 'rgba(10, 14, 39, 0.9)', border: '1px solid rgba(255,255,255,0.2)' }} />
                   <Legend />
-                  <Line type="monotone" dataKey="efficiency_wh_per_km" stroke="#4caf50" name="Wh/km" dot={false} />
+                  <Line type="monotone" dataKey="efficiency_wh_per_mi" stroke="#4caf50" name="Wh/mi" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -148,7 +149,7 @@ function VehicleDetail({ vehicleId, onBack }) {
                   })}
                 </div>
                 <div className="col-distance">{formatDistancePrecise(trip.distance_km)}</div>
-                <div className="col-efficiency">{(trip.efficiency_wh_per_km / 0.621371).toFixed(0)} Wh/mi</div>
+                <div className="col-efficiency">{whPerKmToWhPerMi(trip.efficiency_wh_per_km).toFixed(0)} Wh/mi</div>
                 <div className="col-energy">{trip.energy_used_kwh.toFixed(2)} kWh</div>
               </div>
             ))}
