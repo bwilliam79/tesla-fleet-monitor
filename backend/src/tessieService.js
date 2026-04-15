@@ -136,6 +136,9 @@ const TessieService = {
             const powerKw = state.power ? state.power / 1000 : null;
             const insideTemp = state.inside_temp || null;
 
+            // Convert battery_range from miles to km (Tessie API returns range in miles)
+            const batteryRangeKm = state.battery_range ? state.battery_range * 1.60934 : null;
+
             // Determine charging state from the state field
             let chargingState = 'Idle';
             if (state.charging_state === 'Charging') {
@@ -156,8 +159,8 @@ const TessieService = {
                 vehicleId,
                 state.timestamp,
                 state.battery_level,
-                state.battery_range,
-                state.odometer,
+                batteryRangeKm,
+                state.odometer ? state.odometer * 1.60934 : null,  // Convert miles to km
                 null,  // Efficiency not available from individual states
                 insideTemp,
                 chargingState,
