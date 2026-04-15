@@ -25,14 +25,9 @@ function VehicleCard({ vehicle, onClick }) {
           <h3 className="vehicle-name">{vehicle.name}</h3>
           <p className="vehicle-model">{vehicle.year} {vehicle.model}</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-          <span className={getStatusBadge(status)}>{status}</span>
-          {chargeRateKw && (
-            <span style={{ fontSize: '0.75rem', color: '#00E676', fontFamily: 'JetBrains Mono, monospace' }}>
-              {chargeRateKw} kW
-            </span>
-          )}
-        </div>
+        <span className={getStatusBadge(status)}>
+          {isCharging && chargeRateKw ? `Charging @ ${chargeRateKw} kW` : status}
+        </span>
       </div>
 
       <div className="battery-gauge">
