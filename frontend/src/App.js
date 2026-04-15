@@ -24,9 +24,6 @@ function AppContent() {
   return (
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
       <div className="app-header">
-        <div className="header-left">
-          <h1 className="logo">⚡ Tesla Fleet</h1>
-        </div>
         <div className="header-controls">
           <button className="icon-button" onClick={toggleTheme} title="Toggle dark/light mode">
             {isDark ? '☀️' : '🌙'}
