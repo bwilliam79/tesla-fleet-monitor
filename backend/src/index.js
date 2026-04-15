@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const db = require('./db');
 const { generateMockVehicles, generateMockMetrics, generateMockTrips } = require('./mockData');
+const TessieService = require('./tessieService');
 
 const app = express();
 app.use(cors());
@@ -199,9 +200,20 @@ app.post('/api/config/api-key', (req, res) => {
 
   apiKeyConfig = apiKey.trim();
 
-  // Note: We preserve existing data and will merge Tessie data with it
-  // The app will begin fetching real data from Tessie while maintaining the database
-  res.json({ message: 'API key configured. App will fetch Tessie data while preserving existing data.' });
+  // Start importing Tessie data asynchronously
+  setImmediate(() => {
+    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
+      console.error('Tessie import error:', err);
+    });
+  });
+
+  res.json({ message: 'API key configured. Starting Tessie data import...' });
+});
+
+// Get import progress
+app.get('/api/import/progress', (req, res) => {
+  const progress = TessieService.getImportProgress();
+  res.json(progress || { status: 'idle' });
 });
 
 app.post('/api/config/clear-api-key', (req, res) => {
