@@ -30,6 +30,19 @@ const TessieService = {
     });
   },
 
+  setConfigValue(db, key, value) {
+    return new Promise((resolve, reject) => {
+      db.run(
+        'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)',
+        [key, value],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+  },
+
   async importTessieData(apiKey, db) {
     importProgress = { status: 'starting', message: 'Initializing import...' };
 
@@ -148,6 +161,8 @@ const TessieService = {
         }
       }
 
+      // Mark import as complete in database
+      await this.setConfigValue(db, 'tessie_import_complete', 'true');
       importProgress = { status: 'complete', message: 'Import complete!' };
       return { success: true, message: 'Tessie data imported successfully' };
     } catch (error) {
