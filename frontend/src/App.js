@@ -12,6 +12,7 @@ function AppContent() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [importStatus, setImportStatus] = useState(null);
   const [showImportComplete, setShowImportComplete] = useState(false);
+  const completedRef = React.useRef(false);
   const { isDark, toggleTheme } = useTheme();
 
   // Update the time every minute
@@ -20,7 +21,7 @@ function AppContent() {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle import completion fade out
+  // Handle import completion fade out — runs only once when triggered
   React.useEffect(() => {
     if (showImportComplete) {
       const timer = setTimeout(() => setShowImportComplete(false), 3000);
@@ -37,12 +38,18 @@ function AppContent() {
 
         if (progress.status === 'idle') {
           setImportStatus(null);
-          setShowImportComplete(false);
+          // Reset so the next import can show its completion toast
+          completedRef.current = false;
         } else if (progress.status === 'complete') {
           setImportStatus(null);
-          setShowImportComplete(true);
+          // Only show the toast once per import cycle
+          if (!completedRef.current) {
+            completedRef.current = true;
+            setShowImportComplete(true);
+          }
         } else {
           setImportStatus(progress.message);
+          completedRef.current = false;
         }
       } catch (error) {
         console.error('Error fetching import progress:', error);
