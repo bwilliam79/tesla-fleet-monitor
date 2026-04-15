@@ -1,0 +1,247 @@
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.settings-modal {
+  background: inherit;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.app.dark .settings-modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(232, 33, 39, 0.2);
+  color: #ffffff;
+}
+
+.app.light .settings-modal {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  color: #1a1a1a;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  border-bottom: 1px solid rgba(232, 33, 39, 0.2);
+}
+
+.settings-header h2 {
+  margin: 0;
+  color: #E82127;
+}
+
+.close-button {
+  font-size: 1.5rem;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.app.dark .close-button {
+  color: #ffffff;
+}
+
+.app.light .close-button {
+  color: #1a1a1a;
+}
+
+.settings-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.settings-section h3 {
+  color: #E82127;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.section-description {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.app.dark .section-description {
+  color: #b0b0b0;
+}
+
+.app.light .section-description {
+  color: #666666;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.app.dark .form-group input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(232, 33, 39, 0.2);
+  color: #ffffff;
+}
+
+.app.dark .form-group input::placeholder {
+  color: #707070;
+}
+
+.app.dark .form-group input:focus {
+  outline: none;
+  border-color: #E82127;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.app.light .form-group input {
+  background: #f5f5f5;
+  border: 1px solid #d0d0d0;
+  color: #1a1a1a;
+}
+
+.app.light .form-group input::placeholder {
+  color: #999999;
+}
+
+.app.light .form-group input:focus {
+  outline: none;
+  border-color: #E82127;
+  background: #ffffff;
+}
+
+.field-hint {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.8rem;
+}
+
+.app.dark .field-hint {
+  color: #808080;
+}
+
+.app.light .field-hint {
+  color: #999999;
+}
+
+.field-hint a {
+  color: #E82127;
+  text-decoration: none;
+}
+
+.field-hint a:hover {
+  text-decoration: underline;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.form-actions button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.primary-button {
+  background: #E82127;
+  border: 1px solid #E82127;
+  color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #c71f21;
+  transform: translateY(-2px);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app.dark .danger-button {
+  background: rgba(232, 33, 39, 0.2);
+  border: 1px solid rgba(232, 33, 39, 0.4);
+  color: #E82127;
+}
+
+.app.dark .danger-button:hover:not(:disabled) {
+  background: rgba(232, 33, 39, 0.3);
+  border-color: #E82127;
+}
+
+.app.light .danger-button {
+  background: #ffebee;
+  border: 1px solid #E82127;
+  color: #E82127;
+}
+
+.app.light .danger-button:hover:not(:disabled) {
+  background: #E82127;
+  color: white;
+}
+
+.danger-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 6px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #4caf50;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+  .settings-modal {
+    width: 95%;
+  }
+
+  .settings-header {
+    padding: 1.5rem;
+  }
+
+  .settings-content {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

@@ -1,7 +1,16 @@
-.app {
+/* Dark Mode (Default) */
+.app.dark {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-  color: #e0e0e0;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* Light Mode */
+.app.light {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  color: #1a1a1a;
   overflow-x: hidden;
 }
 
@@ -20,26 +29,81 @@ h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
   padding: 2rem;
 }
 
-.card {
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(232, 33, 39, 0.2);
+  background: rgba(232, 33, 39, 0.05);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #E82127;
+  letter-spacing: -1px;
+}
+
+.header-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.icon-button {
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.icon-button:hover {
+  transform: scale(1.1);
+}
+
+/* Cards - Dark Mode */
+.app.dark .card {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(232, 33, 39, 0.2);
   border-radius: 8px;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
-.card:hover {
+.app.dark .card:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(232, 33, 39, 0.4);
   transform: translateY(-2px);
 }
 
+/* Cards - Light Mode */
+.app.light .card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.app.light .card:hover {
+  background: #ffffff;
+  border-color: #E82127;
+  box-shadow: 0 4px 12px rgba(232, 33, 39, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Buttons */
 button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #e0e0e0;
-  padding: 0.75rem 1.5rem;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.95rem;
@@ -47,62 +111,117 @@ button {
   font-weight: 500;
 }
 
-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.3);
+.app.dark button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+  color: #ffffff;
 }
 
-.text-secondary { color: #a0a0a0; font-size: 0.9rem; }
-.text-muted { color: #707070; }
+.app.dark button:hover {
+  background: rgba(232, 33, 39, 0.2);
+  border-color: #E82127;
+}
 
+.app.light button {
+  background: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  color: #1a1a1a;
+}
+
+.app.light button:hover {
+  background: #E82127;
+  border-color: #E82127;
+  color: white;
+}
+
+/* Text Colors */
+.app.dark .text-secondary { color: #b0b0b0; font-size: 0.9rem; }
+.app.dark .text-muted { color: #808080; }
+
+.app.light .text-secondary { color: #666666; font-size: 0.9rem; }
+.app.light .text-muted { color: #999999; }
+
+/* Badges */
 .badge {
   display: inline-block;
   padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 500;
 }
 
+.app.dark .badge {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.app.light .badge {
+  background: #f0f0f0;
+  border: 1px solid #d0d0d0;
+  color: #1a1a1a;
+}
+
 .badge.charging {
   background: rgba(76, 175, 80, 0.2);
   border-color: rgba(76, 175, 80, 0.4);
-  color: #81c784;
+  color: #4caf50;
 }
 
 .badge.idle {
-  background: rgba(255, 193, 7, 0.2);
-  border-color: rgba(255, 193, 7, 0.4);
-  color: #ffd54f;
+  background: rgba(232, 33, 39, 0.2);
+  border-color: rgba(232, 33, 39, 0.4);
+  color: #E82127;
 }
 
-.loading { text-align: center; padding: 2rem; color: #a0a0a0; }
+/* Loading & Error */
+.app.dark .loading { text-align: center; padding: 2rem; color: #b0b0b0; }
+.app.light .loading { text-align: center; padding: 2rem; color: #666666; }
+
 .error {
-  background: rgba(244, 67, 54, 0.1);
-  border: 1px solid rgba(244, 67, 54, 0.3);
-  color: #ff7961;
+  background: rgba(232, 33, 39, 0.1);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+  color: #E82127;
   padding: 1rem;
   border-radius: 6px;
   margin: 1rem 0;
 }
 
-::-webkit-scrollbar {
+/* Scrollbar - Dark */
+.app.dark ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-::-webkit-scrollbar-track {
+.app.dark ::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.05);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+.app.dark ::-webkit-scrollbar-thumb {
+  background: rgba(232, 33, 39, 0.3);
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+.app.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 33, 39, 0.5);
+}
+
+/* Scrollbar - Light */
+.app.light ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.app.light ::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+.app.light ::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 4px;
+}
+
+.app.light ::-webkit-scrollbar-thumb:hover {
+  background: #E82127;
 }
 
 @media (max-width: 1024px) {
@@ -112,6 +231,7 @@ button:hover {
 
 @media (max-width: 768px) {
   .container { padding: 1rem; }
+  .app-header { padding: 1rem; }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.25rem; }
 }
