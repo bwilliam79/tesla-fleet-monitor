@@ -47,7 +47,7 @@ class TessieClient {
   async getVehicles() {
     const response = await this.request('/api/1/vehicles');
     console.log('Tessie getVehicles response:', JSON.stringify(response, null, 2));
-    return response.results || response || [];
+    return response.response || response.results || [];
   }
 
   async getVehicleData(vin) {
@@ -57,12 +57,12 @@ class TessieClient {
 
   async getVehicleHistory(vin, days = 7) {
     const response = await this.request(`/api/1/vehicles/${vin}/history?days=${days}`);
-    return response.results || [];
+    return response.response || response.results || [];
   }
 
   async getVehicleTrips(vin, days = 90) {
     const response = await this.request(`/api/1/vehicles/${vin}/drives?days=${days}`);
-    return response.results || [];
+    return response.response || response.results || [];
   }
 }
 
