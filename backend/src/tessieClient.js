@@ -60,10 +60,17 @@ class TessieClient {
     const from = now - (days * 24 * 3600);
     // Use interval=120 (2 minutes) to stay under 10000 data point limit
     const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=120`);
-    console.log('States response type:', typeof response, 'is array:', Array.isArray(response), 'keys:', Object.keys(response).slice(0, 5));
+    console.log('States response keys:', Object.keys(response).slice(0, 10));
     if (Array.isArray(response)) return response;
+    if (response.results) {
+      console.log('results type:', typeof response.results, 'is array:', Array.isArray(response.results));
+      if (Array.isArray(response.results)) return response.results;
+      // If results is an object with timestamp keys, convert to array
+      if (typeof response.results === 'object') {
+        return Object.values(response.results);
+      }
+    }
     if (Array.isArray(response.response)) return response.response;
-    if (Array.isArray(response.results)) return response.results;
     return [];
   }
 
