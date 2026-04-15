@@ -287,7 +287,6 @@ app.get('*', (req, res) => {
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, async () => {
   console.log(`Tesla Fleet Monitor API running on port ${PORT}`);
-  initializeMockData();
 
   // Load API key from database on startup
   const savedApiKey = await getConfigValue('tessie_api_key');
@@ -295,16 +294,24 @@ const server = app.listen(PORT, async () => {
 
   if (savedApiKey && !apiKeyConfig) {
     apiKeyConfig = savedApiKey;
+    console.log('Loaded API key from database');
 
-    // Only reattempt import if it hasn't been completed yet
+    // Clear any mock data before attempting import
     if (!importComplete) {
-      console.log('Loaded API key from database, reattempting Tessie import...');
+      console.log('Clearing mock data and reattempting Tessie import...');
+      db.run('DELETE FROM metrics');
+      db.run('DELETE FROM trips');
+      db.run('DELETE FROM vehicles');
       TessieService.importTessieData(apiKeyConfig, db).catch(err => {
         console.error('Tessie import error on startup:', err);
       });
     } else {
-      console.log('Loaded API key from database, import already complete');
+      console.log('Tessie import already complete');
     }
+  } else {
+    // Only initialize mock data if no API key is configured
+    console.log('No API key found, initializing mock data');
+    initializeMockData();
   }
 });
 
