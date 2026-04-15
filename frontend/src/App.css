@@ -95,9 +95,20 @@ h3 {
   animation: slideInRight 0.5s ease-out;
 }
 
+.header-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #E82127;
+  text-shadow: 0 0 15px rgba(232, 33, 39, 0.5);
+}
+
 .header-status {
   display: flex;
   align-items: center;
+  flex: 1;
+  justify-content: center;
 }
 
 .status-text {
