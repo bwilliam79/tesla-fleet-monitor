@@ -91,10 +91,15 @@ const TessieService = {
 
         // Extract color from last_state or use Unknown
         let color = 'Unknown';
+        // Check multiple possible locations for exterior_color
         if (vehicle.last_state?.vehicle_state?.exterior_color) {
           color = vehicle.last_state.vehicle_state.exterior_color;
+        } else if (vehicle.last_state?.vehicle_config?.exterior_color) {
+          color = vehicle.last_state.vehicle_config.exterior_color;
+        } else if (vehicle.exterior_color) {
+          color = vehicle.exterior_color;
         }
-        console.log(`Color extraction for ${displayName}: vehicle_state=${JSON.stringify(vehicle.last_state?.vehicle_state ? Object.keys(vehicle.last_state.vehicle_state) : 'null')}, exterior_color=${vehicle.last_state?.vehicle_state?.exterior_color}, final color=${color}`);
+        console.log(`Color for ${displayName}: vehicle_state keys=${Object.keys(vehicle.last_state?.vehicle_state || {}).slice(0, 5).join(',')}, vehicle_config keys=${Object.keys(vehicle.last_state?.vehicle_config || {}).slice(0, 5).join(',')}, final=${color}`);
 
         // Insert or update vehicle
         await this.dbRun(
