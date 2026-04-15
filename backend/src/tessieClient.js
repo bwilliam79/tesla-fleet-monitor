@@ -56,12 +56,16 @@ class TessieClient {
   }
 
   async getVehicleHistory(vin, days = 7) {
-    const response = await this.request(`/${vin}/states?days=${days}`);
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - (days * 24 * 3600);
+    const response = await this.request(`/${vin}/states?from=${from}&to=${now}&interval=1`);
     return response.response || response.results || [];
   }
 
   async getVehicleTrips(vin, days = 90) {
-    const response = await this.request(`/${vin}/drives?days=${days}`);
+    const now = Math.floor(Date.now() / 1000);
+    const from = now - (days * 24 * 3600);
+    const response = await this.request(`/${vin}/drives?from=${from}&to=${now}`);
     return response.response || response.results || [];
   }
 }
