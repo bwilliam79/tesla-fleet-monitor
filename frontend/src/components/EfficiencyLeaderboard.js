@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { formatEfficiency } from '../utils';
 import './EfficiencyLeaderboard.css';
 
 function EfficiencyLeaderboard() {
@@ -28,7 +29,7 @@ function EfficiencyLeaderboard() {
   return (
     <div className="card leaderboard">
       <h3>Efficiency Leaderboard</h3>
-      <p className="subtitle">30-day average (Wh/km)</p>
+      <p className="subtitle">30-day average (Wh/mi)</p>
 
       <div className="leaderboard-list">
         {leaderboard.map((vehicle, index) => (
@@ -41,8 +42,8 @@ function EfficiencyLeaderboard() {
               <div className="vehicle-meta">{vehicle.model} Model</div>
             </div>
             <div className="efficiency-score">
-              <span className="value">{vehicle.avg_efficiency}</span>
-              <span className="unit">Wh/km</span>
+              <span className="value">{formatEfficiency(vehicle.avg_efficiency)}</span>
+              <span className="unit">Wh/mi</span>
             </div>
           </div>
         ))}
