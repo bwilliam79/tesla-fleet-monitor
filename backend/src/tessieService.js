@@ -99,7 +99,10 @@ const TessieService = {
         } else if (vehicle.exterior_color) {
           color = vehicle.exterior_color;
         }
-        console.log(`Color for ${displayName}: vehicle_state keys=${Object.keys(vehicle.last_state?.vehicle_state || {}).slice(0, 5).join(',')}, vehicle_config keys=${Object.keys(vehicle.last_state?.vehicle_config || {}).slice(0, 5).join(',')}, final=${color}`);
+        // Clean up color name by removing "ExteriorColor" prefix if present
+        if (color.startsWith('ExteriorColor')) {
+          color = color.replace('ExteriorColor', '');
+        }
 
         // Insert or update vehicle
         await this.dbRun(
