@@ -62,12 +62,12 @@ const TessieService = {
       let vehicleCount = 0;
       const totalVehicles = vehicles.length;
 
-      // Step 2: Import each vehicle and its data (skip archived vehicles)
+      // Step 2: Import each vehicle and its data (skip archived/inactive vehicles)
       for (const vehicle of vehicles) {
-        console.log(`Processing vehicle: ${vehicle.display_name || vehicle.vin}, archived: ${vehicle.is_archived_manually}`);
-        // Skip archived vehicles
-        if (vehicle.is_archived_manually) {
-          console.log(`Skipping archived vehicle: ${vehicle.display_name || vehicle.vin}`);
+        console.log(`Processing vehicle: ${vehicle.display_name || vehicle.vin}, active: ${vehicle.is_active}, archived: ${vehicle.is_archived_manually}`);
+        // Skip archived or inactive vehicles
+        if (!vehicle.is_active || vehicle.is_archived_manually) {
+          console.log(`Skipping inactive/archived vehicle: ${vehicle.display_name || vehicle.vin}`);
           continue;
         }
         vehicleCount++;
