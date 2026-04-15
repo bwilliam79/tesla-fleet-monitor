@@ -112,7 +112,7 @@ app.get('/api/vehicles/:vehicleId/daily-stats', (req, res) => {
        ROUND(SUM(distance_mi), 1) as total_distance_mi,
        COUNT(*) as trip_count
      FROM trips
-     WHERE vehicle_id = ? AND start_time >= ? AND efficiency_wh_per_mi IS NOT NULL
+     WHERE vehicle_id = ? AND start_time >= ? AND efficiency_wh_per_mi IS NOT NULL AND distance_mi >= 0.5
      GROUP BY date(start_time, 'unixepoch')
      ORDER BY day ASC`,
     [req.params.vehicleId, cutoff],
@@ -135,7 +135,7 @@ app.get('/api/leaderboard/efficiency', (req, res) => {
        MIN(t.start_time) as first_reading,
        MAX(t.start_time) as last_reading
      FROM vehicles v
-     LEFT JOIN trips t ON v.id = t.vehicle_id AND t.start_time >= ?
+     LEFT JOIN trips t ON v.id = t.vehicle_id AND t.start_time >= ? AND t.distance_mi >= 0.5
      GROUP BY v.id
      ORDER BY avg_efficiency ASC`,
     [thirtyDaysAgo],
