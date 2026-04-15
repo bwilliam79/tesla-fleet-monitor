@@ -1,9 +1,8 @@
 import React from 'react';
-import { kmToMiles } from '../utils';
 import './FleetStats.css';
 
 function FleetStats({ stats }) {
-  const avgRangeMiles = Math.round(kmToMiles(stats.avg_range || 0));
+  const avgRangeMiles = Math.round(stats.avg_range || 0);
 
   return (
     <div className="fleet-stats">

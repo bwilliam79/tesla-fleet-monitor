@@ -136,9 +136,6 @@ const TessieService = {
             const powerKw = state.power ? state.power / 1000 : null;
             const insideTemp = state.inside_temp || null;
 
-            // Convert battery_range from miles to km (Tessie API returns range in miles)
-            const batteryRangeKm = state.battery_range ? state.battery_range * 1.60934 : null;
-
             // Determine charging state from the state field
             let chargingState = 'Idle';
             if (state.charging_state === 'Charging') {
@@ -150,8 +147,8 @@ const TessieService = {
             await this.dbRun(
               db,
               `INSERT OR IGNORE INTO metrics
-               (id, vehicle_id, timestamp, state_of_charge, battery_range_km,
-                odometer_km, efficiency_wh_per_km, temperature_celsius,
+               (id, vehicle_id, timestamp, state_of_charge, battery_range_mi,
+                odometer_mi, efficiency_wh_per_mi, temperature_celsius,
                 charging_state, power_kw)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
               [
@@ -159,8 +156,8 @@ const TessieService = {
                 vehicleId,
                 state.timestamp,
                 state.battery_level,
-                batteryRangeKm,
-                state.odometer ? state.odometer * 1.60934 : null,  // Convert miles to km
+                state.battery_range,  // Already in miles from Tessie API
+                state.odometer,  // Already in miles from Tessie API
                 null,  // Efficiency not available from individual states
                 insideTemp,
                 chargingState,
@@ -177,19 +174,19 @@ const TessieService = {
         // Get trip history (called "drives" in Tessie, using vehicle.vin)
         const drives = await client.getVehicleTrips(vehicle.vin, 90);
 
-        // Insert trips (Tessie provides drives with energy and distance data)
+        // Insert trips (Tessie provides drives with energy and distance data in miles)
         for (const drive of drives) {
-          // Calculate efficiency: Wh/km = (kWh * 1000) / km
-          let efficiencyWhPerKm = null;
+          // Calculate efficiency: Wh/mi = (kWh * 1000) / miles
+          let efficiencyWhPerMi = null;
           if (drive.energy_used && drive.odometer_distance && drive.odometer_distance > 0) {
-            efficiencyWhPerKm = (drive.energy_used * 1000) / drive.odometer_distance;
+            efficiencyWhPerMi = (drive.energy_used * 1000) / drive.odometer_distance;
           }
 
           await this.dbRun(
             db,
             `INSERT OR IGNORE INTO trips
              (id, vehicle_id, start_time, end_time, start_location, end_location,
-              distance_km, energy_used_kwh, efficiency_wh_per_km)
+              distance_mi, energy_used_kwh, efficiency_wh_per_mi)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
               uuidv4(),
@@ -200,7 +197,7 @@ const TessieService = {
               drive.ending_location,
               drive.odometer_distance,
               drive.energy_used,
-              efficiencyWhPerKm,
+              efficiencyWhPerMi,
             ]
           );
         }
