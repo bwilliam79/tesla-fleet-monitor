@@ -5,7 +5,7 @@ services:
     build: .
     container_name: tesla-fleet-monitor
     ports:
-      - "3000:3001"
+      - "3002:3001"
     environment:
       NODE_ENV: production
       PORT: 3001
