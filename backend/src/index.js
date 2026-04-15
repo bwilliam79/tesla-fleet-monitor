@@ -81,19 +81,22 @@ app.get('/api/vehicles/:vehicleId', (req, res) => {
 
 // Get metrics history for a vehicle
 app.get('/api/vehicles/:vehicleId/metrics', (req, res) => {
-  const hours = req.query.hours || 24;
-  const cutoff = Math.floor(Date.now() / 1000) - (hours * 3600);
+  const hours = req.query.hours;
+  let query = 'SELECT * FROM metrics WHERE vehicle_id = ?';
+  let params = [req.params.vehicleId];
 
-  db.all(
-    `SELECT * FROM metrics
-     WHERE vehicle_id = ? AND timestamp >= ?
-     ORDER BY timestamp ASC`,
-    [req.params.vehicleId, cutoff],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows || []);
-    }
-  );
+  if (hours) {
+    const cutoff = Math.floor(Date.now() / 1000) - (hours * 3600);
+    query += ' AND timestamp >= ?';
+    params.push(cutoff);
+  }
+
+  query += ' ORDER BY timestamp ASC';
+
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows || []);
+  });
 });
 
 // Get trip history
@@ -175,6 +178,47 @@ app.get('/api/trips/recent', (req, res) => {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Configuration endpoints
+let apiKeyConfig = process.env.TESSIE_API_KEY || null;
+
+app.get('/api/config/status', (req, res) => {
+  if (apiKeyConfig) {
+    res.json({ message: 'Using Tessie API (production data)' });
+  } else {
+    res.json({ message: 'Using mock data' });
+  }
+});
+
+app.post('/api/config/api-key', (req, res) => {
+  const { apiKey } = req.body;
+  if (!apiKey || !apiKey.trim()) {
+    return res.status(400).json({ error: 'API key is required' });
+  }
+
+  apiKeyConfig = apiKey.trim();
+
+  // Clear mock data from database
+  db.run('DELETE FROM metrics');
+  db.run('DELETE FROM trips');
+  db.run('DELETE FROM vehicles');
+
+  res.json({ message: 'API key configured. Mock data cleared. Ready to fetch real data.' });
+});
+
+app.post('/api/config/clear-api-key', (req, res) => {
+  apiKeyConfig = null;
+
+  // Clear all data
+  db.run('DELETE FROM metrics');
+  db.run('DELETE FROM trips');
+  db.run('DELETE FROM vehicles');
+
+  // Restore mock data
+  initializeMockData();
+
+  res.json({ message: 'API key cleared. Mock data restored.' });
 });
 
 // SPA fallback

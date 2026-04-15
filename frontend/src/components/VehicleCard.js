@@ -1,9 +1,11 @@
 import React from 'react';
+import { kmToMiles, formatRangeMetric } from '../utils';
 import './VehicleCard.css';
 
 function VehicleCard({ vehicle, onClick }) {
   const soc = vehicle.state_of_charge || 0;
-  const range = vehicle.battery_range_km || 0;
+  const rangeKm = vehicle.battery_range_km || 0;
+  const rangeMiles = formatRangeMetric(rangeKm);
   const status = vehicle.charging_state || 'Idle';
 
   const getStatusBadge = (status) => {
@@ -29,13 +31,13 @@ function VehicleCard({ vehicle, onClick }) {
             className="gauge-fill"
             style={{
               width: `${soc}%`,
-              background: soc > 70 ? '#4caf50' : soc > 40 ? '#ffc107' : '#f44336'
+              background: soc > 70 ? '#4caf50' : soc > 40 ? '#ffc107' : '#E82127'
             }}
           />
         </div>
         <div className="gauge-text">
           <span className="soc-value">{soc}%</span>
-          <span className="range-value">{Math.round(range)} km range</span>
+          <span className="range-value">{rangeMiles} mi range</span>
         </div>
       </div>
 
