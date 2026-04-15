@@ -3,9 +3,19 @@ import axios from 'axios';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './VehicleDetail.css';
 
+const tooltipStyle = {
+  background: 'rgba(7, 10, 20, 0.95)',
+  border: '1px solid rgba(0,212,255,0.25)',
+  borderRadius: '8px',
+  fontFamily: 'JetBrains Mono, monospace',
+  fontSize: '0.8rem',
+  color: '#C8E6F0'
+};
+
 function VehicleDetail({ vehicleId, onBack }) {
   const [vehicle, setVehicle] = useState(null);
   const [metrics, setMetrics] = useState([]);
+  const [dailyStats, setDailyStats] = useState([]);
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,9 +23,10 @@ function VehicleDetail({ vehicleId, onBack }) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [vehicleRes, metricsRes, tripsRes] = await Promise.all([
+        const [vehicleRes, metricsRes, dailyRes, tripsRes] = await Promise.all([
           axios.get(`/api/vehicles/${vehicleId}`),
-          axios.get(`/api/vehicles/${vehicleId}/metrics`),
+          axios.get(`/api/vehicles/${vehicleId}/metrics?hours=168`),
+          axios.get(`/api/vehicles/${vehicleId}/daily-stats?days=30`),
           axios.get(`/api/vehicles/${vehicleId}/trips?limit=100`)
         ]);
 
@@ -26,6 +37,10 @@ function VehicleDetail({ vehicleId, onBack }) {
             month: 'short',
             day: 'numeric'
           })
+        })));
+        setDailyStats(dailyRes.data.map(d => ({
+          ...d,
+          day: new Date(d.day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
         })));
         setTrips(tripsRes.data);
       } catch (err) {
@@ -62,7 +77,7 @@ function VehicleDetail({ vehicleId, onBack }) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
                   <XAxis dataKey="timestamp" stroke="#2D4A58" />
                   <YAxis stroke="#2D4A58" />
-                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
+                  <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
                   <Line type="monotone" dataKey="state_of_charge" stroke="#00D4FF" name="SOC (%)" dot={false} strokeWidth={2} />
                 </LineChart>
@@ -73,32 +88,32 @@ function VehicleDetail({ vehicleId, onBack }) {
           </div>
 
           <div className="card">
-            <h3>Efficiency Over Time</h3>
-            {metrics.length > 0 ? (
+            <h3>Efficiency Over Time (30 Days)</h3>
+            {dailyStats.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={metrics}>
+                <LineChart data={dailyStats}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
-                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <XAxis dataKey="day" stroke="#2D4A58" />
                   <YAxis stroke="#2D4A58" />
-                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
+                  <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
-                  <Line type="monotone" dataKey="efficiency_wh_per_mi" stroke="#00E676" name="Wh/mi" dot={false} strokeWidth={2} />
+                  <Line type="monotone" dataKey="avg_efficiency" stroke="#00E676" name="Avg Wh/mi" dot={false} strokeWidth={2} />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted">No data available</p>
+              <p className="text-muted">No trip data available</p>
             )}
           </div>
 
           <div className="card">
-            <h3>Range vs Temperature</h3>
+            <h3>Range History (7 Days)</h3>
             {metrics.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={metrics}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
                   <XAxis dataKey="timestamp" stroke="#2D4A58" />
                   <YAxis stroke="#2D4A58" />
-                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
+                  <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
                   <Bar dataKey="battery_range_mi" fill="rgba(0,212,255,0.6)" name="Range (mi)" radius={[3,3,0,0]} />
                 </BarChart>
@@ -109,20 +124,20 @@ function VehicleDetail({ vehicleId, onBack }) {
           </div>
 
           <div className="card">
-            <h3>Power Draw (kW)</h3>
-            {metrics.length > 0 ? (
+            <h3>Daily Energy Used (30 Days)</h3>
+            {dailyStats.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={metrics}>
+                <BarChart data={dailyStats}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.08)" />
-                  <XAxis dataKey="timestamp" stroke="#2D4A58" />
+                  <XAxis dataKey="day" stroke="#2D4A58" />
                   <YAxis stroke="#2D4A58" />
-                  <Tooltip contentStyle={{ background: 'rgba(7, 10, 20, 0.95)', border: '1px solid rgba(0,212,255,0.25)', borderRadius: '8px', fontFamily: 'JetBrains Mono, monospace', fontSize: '0.8rem', color: '#C8E6F0' }} />
+                  <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
-                  <Line type="monotone" dataKey="power_kw" stroke="#FFB300" name="Power (kW)" dot={false} strokeWidth={2} />
-                </LineChart>
+                  <Bar dataKey="total_energy_kwh" fill="rgba(255,179,0,0.7)" name="Energy (kWh)" radius={[3,3,0,0]} />
+                </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-muted">No data available</p>
+              <p className="text-muted">No trip data available</p>
             )}
           </div>
         </div>
