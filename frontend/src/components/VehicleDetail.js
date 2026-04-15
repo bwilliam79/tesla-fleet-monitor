@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { kmToMiles, formatDistancePrecise } from '../utils';
+import { formatDistancePrecise } from '../utils';
 import './VehicleDetail.css';
 
 function VehicleDetail({ vehicleId, onBack }) {
