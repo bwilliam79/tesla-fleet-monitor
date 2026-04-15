@@ -64,6 +64,7 @@ const TessieService = {
 
       // Step 2: Import each vehicle and its data (skip archived vehicles)
       for (const vehicle of vehicles) {
+        console.log(`Processing vehicle: ${vehicle.display_name || vehicle.vin}, archived: ${vehicle.is_archived_manually}`);
         // Skip archived vehicles
         if (vehicle.is_archived_manually) {
           console.log(`Skipping archived vehicle: ${vehicle.display_name || vehicle.vin}`);
