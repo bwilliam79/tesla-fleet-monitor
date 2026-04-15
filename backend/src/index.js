@@ -184,6 +184,29 @@ app.get('/api/health', (req, res) => {
 // Configuration endpoints
 let apiKeyConfig = process.env.TESSIE_API_KEY || null;
 
+// Helper functions for persistent config
+const getConfigValue = (key) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT value FROM config WHERE key = ?', [key], (err, row) => {
+      if (err) reject(err);
+      else resolve(row ? row.value : null);
+    });
+  });
+};
+
+const setConfigValue = (key, value) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)',
+      [key, value],
+      (err) => {
+        if (err) reject(err);
+        else resolve();
+      }
+    );
+  });
+};
+
 app.get('/api/config/status', (req, res) => {
   if (apiKeyConfig) {
     res.json({ message: 'Using Tessie API (production data)' });
@@ -200,6 +223,16 @@ app.post('/api/config/api-key', (req, res) => {
 
   const isFirstTimeSetup = !apiKeyConfig;
   apiKeyConfig = apiKey.trim();
+
+  // Persist API key to database
+  setConfigValue('tessie_api_key', apiKeyConfig).catch(err => {
+    console.error('Failed to save API key:', err);
+  });
+
+  // Clear import completion flag so we'll retry on next startup if it fails
+  setConfigValue('tessie_import_complete', 'false').catch(err => {
+    console.error('Failed to clear import flag:', err);
+  });
 
   // Only clear data on first setup, not on re-setting the key
   if (isFirstTimeSetup) {
@@ -227,6 +260,14 @@ app.get('/api/import/progress', (req, res) => {
 app.post('/api/config/clear-api-key', (req, res) => {
   apiKeyConfig = null;
 
+  // Clear API key and import flags from database
+  setConfigValue('tessie_api_key', null).catch(err => {
+    console.error('Failed to clear API key:', err);
+  });
+  setConfigValue('tessie_import_complete', 'false').catch(err => {
+    console.error('Failed to clear import flag:', err);
+  });
+
   // Clear all data
   db.run('DELETE FROM metrics');
   db.run('DELETE FROM trips');
@@ -244,9 +285,27 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`Tesla Fleet Monitor API running on port ${PORT}`);
   initializeMockData();
+
+  // Load API key from database on startup
+  const savedApiKey = await getConfigValue('tessie_api_key');
+  const importComplete = await getConfigValue('tessie_import_complete');
+
+  if (savedApiKey && !apiKeyConfig) {
+    apiKeyConfig = savedApiKey;
+
+    // Only reattempt import if it hasn't been completed yet
+    if (!importComplete) {
+      console.log('Loaded API key from database, reattempting Tessie import...');
+      TessieService.importTessieData(apiKeyConfig, db).catch(err => {
+        console.error('Tessie import error on startup:', err);
+      });
+    } else {
+      console.log('Loaded API key from database, import already complete');
+    }
+  }
 });
 
 module.exports = server;

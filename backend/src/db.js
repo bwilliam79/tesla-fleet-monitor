@@ -58,6 +58,14 @@ db.serialize(() => {
     )
   `);
 
+  // Config table - for storing API key and import status
+  db.run(`
+    CREATE TABLE IF NOT EXISTS config (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )
+  `);
+
   // Create indices for faster queries
   db.run(`CREATE INDEX IF NOT EXISTS idx_metrics_vehicle_timestamp
           ON metrics(vehicle_id, timestamp DESC)`);
