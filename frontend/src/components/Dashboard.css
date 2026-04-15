@@ -7,47 +7,65 @@
   display: none;
 }
 
+/* ─── Section ─────────────────────────────────────── */
 .section {
   margin-bottom: 3rem;
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeUp 0.55s ease-out;
 }
 
 .section h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem 0;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
+/* neon left-bar accent */
+.section h2::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 1.1em;
+  background: linear-gradient(180deg, var(--red), var(--cyan));
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+  flex-shrink: 0;
+}
+
+/* bottom divider */
 .section h2::after {
   content: '';
   position: absolute;
-  bottom: -0.5rem;
+  bottom: -0.6rem;
   left: 0;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, #E82127, transparent);
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cyan-dim), transparent);
 }
 
+/* ─── Vehicles grid ───────────────────────────────── */
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
 .vehicles-grid > div {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeUp 0.5s ease-out;
 }
 
+/* ─── Two column ──────────────────────────────────── */
 .two-column {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1.75rem;
   margin-top: 2rem;
 }
 
 .two-column > div {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeUp 0.55s ease-out;
 }
 
 @media (max-width: 1200px) {
@@ -61,11 +79,11 @@
     padding: 1rem;
   }
 
-  .dashboard-header {
-    justify-content: flex-end;
-  }
-
   .vehicles-grid {
     grid-template-columns: 1fr;
+  }
+
+  .two-column {
+    gap: 1.25rem;
   }
 }
