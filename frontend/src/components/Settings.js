@@ -33,6 +33,8 @@ function Settings({ onClose }) {
       setStatus(res.data.message);
       setApiKey('');
       alert('API Key configured successfully! Mock data has been cleared.');
+      // Reload page to show real data
+      setTimeout(() => window.location.reload(), 500);
     } catch (err) {
       alert('Error setting API key: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -48,6 +50,8 @@ function Settings({ onClose }) {
       const res = await axios.post('/api/config/clear-api-key');
       setStatus(res.data.message);
       alert('API key cleared. Mock data has been restored.');
+      // Reload page to show mock data
+      setTimeout(() => window.location.reload(), 500);
     } catch (err) {
       alert('Error clearing API key: ' + (err.response?.data?.error || err.message));
     } finally {
