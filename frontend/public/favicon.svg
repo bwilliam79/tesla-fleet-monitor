@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" fill="#000000"/>
-  <path d="M50 20 Q75 35 75 50 Q75 65 50 80 Q25 65 25 50 Q25 35 50 20 M50 35 L65 50 L50 65 L35 50 Z" fill="#E82127" stroke="#ffffff" stroke-width="1"/>
+  <rect width="100" height="100" rx="18" fill="#E82127"/>
+  <!-- Tesla T: curved top wings + vertical stem -->
+  <path d="M50 27 C50 27 63 30 74 23 C72 32 50 33 50 33 C50 33 28 32 26 23 C37 30 50 27 50 27 Z" fill="white"/>
+  <rect x="46" y="33" width="8" height="44" rx="2" fill="white"/>
 </svg>
