@@ -39,8 +39,10 @@ const TessieService = {
       // Step 1: Get all vehicles
       importProgress = { status: 'fetching_vehicles', message: 'Fetching vehicles from Tessie...' };
       const vehicles = await client.getVehicles();
+      console.log('Vehicles fetched:', vehicles);
 
       if (!vehicles || vehicles.length === 0) {
+        console.error('No vehicles found. Raw response was:', vehicles);
         throw new Error('No vehicles found in Tessie account');
       }
 
