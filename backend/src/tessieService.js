@@ -81,7 +81,15 @@ const TessieService = {
         const existing = await this.dbGet(db, 'SELECT id FROM vehicles WHERE vin = ?', [vehicle.vin]);
         const vehicleId = existing ? existing.id : uuidv4();
 
-        // Insert or update vehicle (Tessie doesn't provide model/year, so we'll use display_name)
+        // Extract model from vehicle_config or use last_state
+        let model = 'Unknown';
+        if (vehicle.vehicle_config?.model) {
+          model = vehicle.vehicle_config.model;
+        } else if (vehicle.last_state?.vehicle_config?.model) {
+          model = vehicle.last_state.vehicle_config.model;
+        }
+
+        // Insert or update vehicle
         await this.dbRun(
           db,
           `INSERT OR REPLACE INTO vehicles (id, name, vin, model, color, year)
@@ -90,7 +98,7 @@ const TessieService = {
             vehicleId,
             vehicle.display_name || vehicle.vin,
             vehicle.vin,
-            vehicle.vehicle_config?.model || 'Unknown',
+            model,
             vehicle.color || 'Unknown',
             null,  // Tessie doesn't provide year
           ]
