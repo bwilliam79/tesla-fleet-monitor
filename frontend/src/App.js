@@ -9,7 +9,14 @@ function AppContent() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedVehicleId, setSelectedVehicleId] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
   const { isDark, toggleTheme } = useTheme();
+
+  // Update the time every minute
+  React.useEffect(() => {
+    const interval = setInterval(() => setLastUpdated(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleViewVehicle = (vehicleId) => {
     setSelectedVehicleId(vehicleId);
@@ -24,6 +31,9 @@ function AppContent() {
   return (
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
       <div className="app-header">
+        <div className="header-status">
+          <span className="status-text">Last updated: {lastUpdated.toLocaleTimeString()}</span>
+        </div>
         <div className="header-controls">
           <button className="icon-button" onClick={toggleTheme} title="Toggle dark/light mode">
             {isDark ? '☀️' : '🌙'}
