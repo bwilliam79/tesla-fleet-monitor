@@ -12,4 +12,9 @@ services:
     volumes:
       - ./backend:/app/backend
       - /app/backend/node_modules
+      - tesla_db:/app/backend/data
     restart: unless-stopped
+
+volumes:
+  tesla_db:
+    driver: local

@@ -31,6 +31,7 @@ function AppContent() {
   return (
     <div className={`app ${isDark ? 'dark' : 'light'}`}>
       <div className="app-header">
+        <div className="header-title">Tesla Fleet Monitor</div>
         <div className="header-status">
           <span className="status-text">Last updated: {lastUpdated.toLocaleTimeString()}</span>
         </div>

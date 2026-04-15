@@ -199,12 +199,9 @@ app.post('/api/config/api-key', (req, res) => {
 
   apiKeyConfig = apiKey.trim();
 
-  // Clear mock data from database
-  db.run('DELETE FROM metrics');
-  db.run('DELETE FROM trips');
-  db.run('DELETE FROM vehicles');
-
-  res.json({ message: 'API key configured. Mock data cleared. Ready to fetch real data.' });
+  // Note: We preserve existing data and will merge Tessie data with it
+  // The app will begin fetching real data from Tessie while maintaining the database
+  res.json({ message: 'API key configured. App will fetch Tessie data while preserving existing data.' });
 });
 
 app.post('/api/config/clear-api-key', (req, res) => {
