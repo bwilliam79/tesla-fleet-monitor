@@ -46,7 +46,8 @@ class TessieClient {
 
   async getVehicles() {
     const response = await this.request('/api/1/vehicles');
-    return response.results || [];
+    console.log('Tessie getVehicles response:', JSON.stringify(response, null, 2));
+    return response.results || response || [];
   }
 
   async getVehicleData(vin) {
