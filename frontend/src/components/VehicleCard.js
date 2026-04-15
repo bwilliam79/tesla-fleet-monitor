@@ -44,11 +44,11 @@ function VehicleCard({ vehicle, onClick }) {
       <div className="vehicle-details">
         <div className="detail-item">
           <span className="detail-label">Color</span>
-          <span className="detail-value">{vehicle.color}</span>
+          <span className="detail-value">{vehicle.color || 'N/A'}</span>
         </div>
         <div className="detail-item">
           <span className="detail-label">VIN</span>
-          <span className="detail-value">{vehicle.vin?.slice(-4)}</span>
+          <span className="detail-value">{vehicle.vin}</span>
         </div>
       </div>
 

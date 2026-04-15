@@ -80,12 +80,19 @@ const TessieService = {
         const existing = await this.dbGet(db, 'SELECT id FROM vehicles WHERE vin = ?', [vehicle.vin]);
         const vehicleId = existing ? existing.id : uuidv4();
 
-        // Extract model from vehicle_config or use last_state
+        // Extract display_name from last_state (that's where Tessie puts it)
+        const displayName = vehicle.last_state?.display_name || vehicle.display_name || vehicle.vin;
+
+        // Extract model from vehicle_config
         let model = 'Unknown';
-        if (vehicle.vehicle_config?.model) {
-          model = vehicle.vehicle_config.model;
-        } else if (vehicle.last_state?.vehicle_config?.model) {
+        if (vehicle.last_state?.vehicle_config?.model) {
           model = vehicle.last_state.vehicle_config.model;
+        }
+
+        // Extract color from last_state or use Unknown
+        let color = 'Unknown';
+        if (vehicle.last_state?.vehicle_state?.exterior_color) {
+          color = vehicle.last_state.vehicle_state.exterior_color;
         }
 
         // Insert or update vehicle
@@ -95,16 +102,17 @@ const TessieService = {
            VALUES (?, ?, ?, ?, ?, ?)`,
           [
             vehicleId,
-            vehicle.display_name || vehicle.vin,
+            displayName,
             vehicle.vin,
             model,
-            vehicle.color || 'Unknown',
+            color,
             null,  // Tessie doesn't provide year
           ]
         );
 
         // Get historical metrics/states (using vehicle.vin)
         const history = await client.getVehicleHistory(vehicle.vin);
+        console.log(`Got ${history.length} historical states for ${displayName}`);
 
         // Insert metrics (Tessie provides battery_level, battery_range, power, inside_temp, etc.)
         for (const state of history) {
