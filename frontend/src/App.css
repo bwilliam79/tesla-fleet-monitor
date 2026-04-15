@@ -1,9 +1,47 @@
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(232, 33, 39, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(232, 33, 39, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
 /* Dark Mode (Default) */
 .app.dark {
   min-height: 100vh;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   color: #ffffff;
   overflow-x: hidden;
+  animation: fadeIn 0.6s ease-out;
 }
 
 /* Light Mode */
@@ -12,16 +50,32 @@
   background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
   color: #1a1a1a;
   overflow-x: hidden;
+  animation: fadeIn 0.6s ease-out;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 500;
-  letter-spacing: -0.5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-h2 { font-size: 1.75rem; margin-bottom: 1rem; }
-h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 20px rgba(232, 33, 39, 0.3);
+}
+
+h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #E82127;
+}
+
+h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #E82127;
+}
 
 .container {
   max-width: 1600px;
@@ -31,11 +85,28 @@ h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
 
 .app-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 0.75rem 2rem;
-  border-bottom: 1px solid rgba(232, 33, 39, 0.2);
-  background: rgba(232, 33, 39, 0.05);
+  border-bottom: 1px solid rgba(232, 33, 39, 0.3);
+  background: rgba(232, 33, 39, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(232, 33, 39, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: slideInRight 0.5s ease-out;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #E82127;
+  text-shadow: 0 0 10px rgba(232, 33, 39, 0.5);
 }
 
 .header-controls {
@@ -45,80 +116,113 @@ h3 { font-size: 1.25rem; margin-bottom: 0.75rem; }
 
 .icon-button {
   font-size: 1.25rem;
-  padding: 0.5rem;
-  border: none;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-button:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  background: rgba(232, 33, 39, 0.15);
+  border: 1px solid rgba(232, 33, 39, 0.3);
+}
+
+.icon-button:active {
+  transform: scale(0.95);
 }
 
 /* Cards - Dark Mode */
 .app.dark .card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(232, 33, 39, 0.2);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(232, 33, 39, 0.25);
+  border-radius: 12px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  backdrop-filter: blur(10px) brightness(1.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: fadeIn 0.5s ease-out;
 }
 
 .app.dark .card:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(232, 33, 39, 0.4);
-  transform: translateY(-2px);
+  border-color: rgba(232, 33, 39, 0.5);
+  box-shadow: 0 16px 48px rgba(232, 33, 39, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
 }
 
 /* Cards - Light Mode */
 .app.light .card {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(224, 224, 224, 0.6);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(232, 33, 39, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation: fadeIn 0.5s ease-out;
 }
 
 .app.light .card:hover {
   background: #ffffff;
   border-color: #E82127;
-  box-shadow: 0 4px 12px rgba(232, 33, 39, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(232, 33, 39, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: translateY(-4px);
 }
 
 /* Buttons */
 button {
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
-  transition: all 0.2s ease;
-  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
 }
 
 .app.dark button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(232, 33, 39, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(232, 33, 39, 0.4);
   color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .app.dark button:hover {
-  background: rgba(232, 33, 39, 0.2);
+  background: rgba(232, 33, 39, 0.25);
   border-color: #E82127;
+  box-shadow: 0 8px 24px rgba(232, 33, 39, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.app.dark button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(232, 33, 39, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .app.light button {
-  background: #f0f0f0;
-  border: 1px solid #d0d0d0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid #d0d0d0;
   color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .app.light button:hover {
   background: #E82127;
   border-color: #E82127;
   color: white;
+  box-shadow: 0 8px 24px rgba(232, 33, 39, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.app.light button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(232, 33, 39, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Text Colors */

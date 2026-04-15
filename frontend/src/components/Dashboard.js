@@ -43,15 +43,11 @@ function Dashboard({ onViewVehicle }) {
   return (
     <div className="dashboard">
       <div className="container">
-        <header className="dashboard-header">
-          <div>
-            <h1>Tesla Fleet Monitor</h1>
-            <p className="subtitle">Real-time monitoring for your electric fleet</p>
-          </div>
+        <div className="dashboard-header">
           <div className="last-updated">
             Last updated: {new Date().toLocaleTimeString()}
           </div>
-        </header>
+        </div>
 
         {error && <div className="error">{error}</div>}
 
