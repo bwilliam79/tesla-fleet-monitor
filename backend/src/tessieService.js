@@ -113,42 +113,52 @@ const TessieService = {
         // Get historical metrics/states (using vehicle.vin)
         const history = await client.getVehicleHistory(vehicle.vin);
         console.log(`Got ${history.length} historical states for ${displayName}`);
+        if (history.length > 0) {
+          console.log(`First state sample:`, JSON.stringify(history[0]).substring(0, 200));
+        }
 
         // Insert metrics (Tessie provides battery_level, battery_range, power, inside_temp, etc.)
+        let insertedCount = 0;
         for (const state of history) {
-          // Tessie provides power in kW directly
-          const powerKw = state.power ? state.power / 1000 : null;
-          const insideTemp = state.inside_temp || null;
+          try {
+            // Tessie provides power in kW directly
+            const powerKw = state.power ? state.power / 1000 : null;
+            const insideTemp = state.inside_temp || null;
 
-          // Determine charging state from the state field
-          let chargingState = 'Idle';
-          if (state.charging_state === 'Charging') {
-            chargingState = 'Charging';
-          } else if (state.state === 'driving') {
-            chargingState = 'Discharging';
+            // Determine charging state from the state field
+            let chargingState = 'Idle';
+            if (state.charging_state === 'Charging') {
+              chargingState = 'Charging';
+            } else if (state.state === 'driving') {
+              chargingState = 'Discharging';
+            }
+
+            await this.dbRun(
+              db,
+              `INSERT OR IGNORE INTO metrics
+               (id, vehicle_id, timestamp, state_of_charge, battery_range_km,
+                odometer_km, efficiency_wh_per_km, temperature_celsius,
+                charging_state, power_kw)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                uuidv4(),
+                vehicleId,
+                state.timestamp,
+                state.battery_level,
+                state.battery_range,
+                state.odometer,
+                null,  // Efficiency not available from individual states
+                insideTemp,
+                chargingState,
+                powerKw,
+              ]
+            );
+            insertedCount++;
+          } catch (err) {
+            console.error(`Error inserting metric for ${displayName}:`, err.message);
           }
-
-          await this.dbRun(
-            db,
-            `INSERT OR IGNORE INTO metrics
-             (id, vehicle_id, timestamp, state_of_charge, battery_range_km,
-              odometer_km, efficiency_wh_per_km, temperature_celsius,
-              charging_state, power_kw)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              uuidv4(),
-              vehicleId,
-              state.timestamp,
-              state.battery_level,
-              state.battery_range,
-              state.odometer,
-              null,  // Efficiency not available from individual states
-              insideTemp,
-              chargingState,
-              powerKw,
-            ]
-          );
         }
+        console.log(`Inserted ${insertedCount} metrics for ${displayName}`);
 
         // Get trip history (called "drives" in Tessie, using vehicle.vin)
         const drives = await client.getVehicleTrips(vehicle.vin, 90);
