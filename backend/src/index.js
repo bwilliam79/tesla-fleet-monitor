@@ -27,11 +27,11 @@ function initializeMockData() {
     metrics.forEach(metric => {
       db.run(
         `INSERT OR IGNORE INTO metrics
-         (id, vehicle_id, timestamp, state_of_charge, battery_range_km, odometer_km,
-          efficiency_wh_per_km, temperature_celsius, charging_state, power_kw)
+         (id, vehicle_id, timestamp, state_of_charge, battery_range_mi, odometer_mi,
+          efficiency_wh_per_mi, temperature_celsius, charging_state, power_kw)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [metric.id, metric.vehicle_id, metric.timestamp, metric.state_of_charge,
-         metric.battery_range_km, metric.odometer_km, metric.efficiency_wh_per_km,
+         metric.battery_range_mi, metric.odometer_mi, metric.efficiency_wh_per_mi,
          metric.temperature_celsius, metric.charging_state, metric.power_kw]
       );
     });
@@ -41,10 +41,10 @@ function initializeMockData() {
       db.run(
         `INSERT OR IGNORE INTO trips
          (id, vehicle_id, start_time, end_time, start_location, end_location,
-          distance_km, energy_used_kwh, efficiency_wh_per_km)
+          distance_mi, energy_used_kwh, efficiency_wh_per_mi)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [trip.id, trip.vehicle_id, trip.start_time, trip.end_time, trip.start_location,
-         trip.end_location, trip.distance_km, trip.energy_used_kwh, trip.efficiency_wh_per_km]
+         trip.end_location, trip.distance_mi, trip.energy_used_kwh, trip.efficiency_wh_per_mi]
       );
     });
   });
@@ -55,7 +55,7 @@ function initializeMockData() {
 // Get all vehicles with latest metrics
 app.get('/api/vehicles', (req, res) => {
   db.all(
-    `SELECT v.*, m.state_of_charge, m.battery_range_km, m.charging_state, m.timestamp
+    `SELECT v.*, m.state_of_charge, m.battery_range_mi, m.charging_state, m.timestamp
      FROM vehicles v
      LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)
      ORDER BY v.name`,
@@ -123,7 +123,7 @@ app.get('/api/leaderboard/efficiency', (req, res) => {
   db.all(
     `SELECT
        v.id, v.name, v.model,
-       ROUND(AVG(m.efficiency_wh_per_km), 2) as avg_efficiency,
+       ROUND(AVG(m.efficiency_wh_per_mi), 2) as avg_efficiency,
        COUNT(*) as data_points,
        MIN(m.timestamp) as first_reading,
        MAX(m.timestamp) as last_reading
@@ -145,7 +145,7 @@ app.get('/api/fleet/stats', (req, res) => {
     `SELECT
        COUNT(DISTINCT v.id) as total_vehicles,
        ROUND(AVG(m.state_of_charge), 1) as avg_soc,
-       ROUND(AVG(m.battery_range_km), 1) as avg_range,
+       ROUND(AVG(m.battery_range_mi), 1) as avg_range,
        SUM(CASE WHEN m.charging_state = 'Charging' THEN 1 ELSE 0 END) as charging_count
      FROM vehicles v
      LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp = (SELECT MAX(timestamp) FROM metrics WHERE vehicle_id = v.id)`,

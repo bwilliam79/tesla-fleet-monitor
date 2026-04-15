@@ -25,16 +25,16 @@ db.serialize(() => {
     )
   `);
 
-  // Metrics table - stores periodic snapshots of vehicle data
+  // Metrics table - stores periodic snapshots of vehicle data (all distances in miles)
   db.run(`
     CREATE TABLE IF NOT EXISTS metrics (
       id TEXT PRIMARY KEY,
       vehicle_id TEXT NOT NULL,
       timestamp INTEGER NOT NULL,
       state_of_charge INTEGER,
-      battery_range_km REAL,
-      odometer_km REAL,
-      efficiency_wh_per_km REAL,
+      battery_range_mi REAL,
+      odometer_mi REAL,
+      efficiency_wh_per_mi REAL,
       temperature_celsius REAL,
       charging_state TEXT,
       power_kw REAL,
@@ -42,7 +42,7 @@ db.serialize(() => {
     )
   `);
 
-  // Trips table - for trip history
+  // Trips table - for trip history (all distances in miles)
   db.run(`
     CREATE TABLE IF NOT EXISTS trips (
       id TEXT PRIMARY KEY,
@@ -51,9 +51,9 @@ db.serialize(() => {
       end_time INTEGER,
       start_location TEXT,
       end_location TEXT,
-      distance_km REAL,
+      distance_mi REAL,
       energy_used_kwh REAL,
-      efficiency_wh_per_km REAL,
+      efficiency_wh_per_mi REAL,
       FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
     )
   `);

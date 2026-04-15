@@ -13,8 +13,7 @@ export const formatDistancePrecise = (km) => {
   return `${miles.toFixed(1)} mi`;
 };
 
-export const formatRangeMetric = (km) => {
-  const miles = kmToMiles(km);
+export const formatRangeMetric = (miles) => {
   return Math.round(miles);
 };
 

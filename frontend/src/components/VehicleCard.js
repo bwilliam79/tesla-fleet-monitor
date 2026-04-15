@@ -4,8 +4,7 @@ import './VehicleCard.css';
 
 function VehicleCard({ vehicle, onClick }) {
   const soc = vehicle.state_of_charge || 0;
-  const rangeKm = vehicle.battery_range_km || 0;
-  const rangeMiles = formatRangeMetric(rangeKm);
+  const rangeMiles = formatRangeMetric(vehicle.battery_range_mi || 0);
   const status = vehicle.charging_state || 'Idle';
 
   const getStatusBadge = (status) => {

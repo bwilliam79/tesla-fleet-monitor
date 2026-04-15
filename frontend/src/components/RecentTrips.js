@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { kmToMiles, whPerKmToWhPerMi } from '../utils';
 import './RecentTrips.css';
 
 function RecentTrips() {
@@ -55,9 +54,9 @@ function RecentTrips() {
                 {trip.start_location} → {trip.end_location}
               </div>
               <div className="trip-stats">
-                <span>{kmToMiles(trip.distance_km).toFixed(1)} mi</span>
+                <span>{trip.distance_mi.toFixed(1)} mi</span>
                 <span>•</span>
-                <span>{whPerKmToWhPerMi(trip.efficiency_wh_per_km).toFixed(0)} Wh/mi</span>
+                <span>{trip.efficiency_wh_per_mi.toFixed(0)} Wh/mi</span>
               </div>
             </div>
           </div>
