@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const db = require('./db');
-const { generateMockVehicles, generateMockMetrics, generateMockTrips } = require('./mockData');
 const TessieService = require('./tessieService');
 
 const app = express();
@@ -13,51 +13,25 @@ app.use(express.json());
 const frontendBuildPath = path.join(__dirname, '../../frontend/build');
 app.use(express.static(frontendBuildPath));
 
-// Initialize mock data on startup
-function initializeMockData() {
-  const vehicles = generateMockVehicles();
+// API key is stored as a plain file in the data volume so it survives DB wipes
+const API_KEY_FILE = path.join(__dirname, '../data/tessie_api_key');
 
-  vehicles.forEach(vehicle => {
-    db.run(
-      'INSERT OR IGNORE INTO vehicles (id, name, vin, model, color, year) VALUES (?, ?, ?, ?, ?, ?)',
-      [vehicle.id, vehicle.name, vehicle.vin, vehicle.model, vehicle.color, vehicle.year],
-      function(err) {
-        if (err) console.error('Error inserting vehicle:', err);
-      }
-    );
-
-    const metrics = generateMockMetrics(vehicle.id);
-    metrics.forEach(metric => {
-      db.run(
-        `INSERT OR IGNORE INTO metrics
-         (id, vehicle_id, timestamp, state_of_charge, battery_range_mi, odometer_mi,
-          efficiency_wh_per_mi, temperature_celsius, charging_state, power_kw)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [metric.id, metric.vehicle_id, metric.timestamp, metric.state_of_charge,
-         metric.battery_range_mi, metric.odometer_mi, metric.efficiency_wh_per_mi,
-         metric.temperature_celsius, metric.charging_state, metric.power_kw],
-        function(err) {
-          if (err) console.error('Error inserting metric:', err);
-        }
-      );
-    });
-
-    const trips = generateMockTrips(vehicle.id);
-    trips.forEach(trip => {
-      db.run(
-        `INSERT OR IGNORE INTO trips
-         (id, vehicle_id, start_time, end_time, start_location, end_location,
-          distance_mi, energy_used_kwh, efficiency_wh_per_mi)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [trip.id, trip.vehicle_id, trip.start_time, trip.end_time, trip.start_location,
-         trip.end_location, trip.distance_mi, trip.energy_used_kwh, trip.efficiency_wh_per_mi],
-        function(err) {
-          if (err) console.error('Error inserting trip:', err);
-        }
-      );
-    });
-  });
+function loadApiKey() {
+  try {
+    if (fs.existsSync(API_KEY_FILE)) {
+      return fs.readFileSync(API_KEY_FILE, 'utf8').trim() || null;
+    }
+  } catch (err) {
+    console.error('Error reading API key file:', err);
+  }
+  return null;
 }
+
+function saveApiKey(key) {
+  fs.writeFileSync(API_KEY_FILE, key, 'utf8');
+}
+
+let apiKeyConfig = null;
 
 // Routes
 
@@ -188,74 +162,58 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Configuration endpoints
-let apiKeyConfig = process.env.TESSIE_API_KEY || null;
-
-// Helper functions for persistent config
-const getConfigValue = (key) => {
-  return new Promise((resolve, reject) => {
-    db.get('SELECT value FROM config WHERE key = ?', [key], (err, row) => {
-      if (err) reject(err);
-      else resolve(row ? row.value : null);
-    });
-  });
-};
-
-const setConfigValue = (key, value) => {
-  return new Promise((resolve, reject) => {
-    db.run(
-      'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)',
-      [key, value],
-      (err) => {
-        if (err) reject(err);
-        else resolve();
-      }
-    );
-  });
-};
-
+// Get config status
 app.get('/api/config/status', (req, res) => {
   if (apiKeyConfig) {
-    res.json({ message: 'Using Tessie API (production data)' });
+    res.json({ message: 'Connected to Tessie API', hasApiKey: true });
   } else {
-    res.json({ message: 'Using mock data' });
+    res.json({ message: 'No API key configured', hasApiKey: false });
   }
 });
 
+// Set API key
 app.post('/api/config/api-key', (req, res) => {
   const { apiKey } = req.body;
   if (!apiKey || !apiKey.trim()) {
     return res.status(400).json({ error: 'API key is required' });
   }
 
-  const isFirstTimeSetup = !apiKeyConfig;
   apiKeyConfig = apiKey.trim();
+  saveApiKey(apiKeyConfig);
 
-  // Persist API key to database
-  setConfigValue('tessie_api_key', apiKeyConfig).catch(err => {
-    console.error('Failed to save API key:', err);
-  });
+  // Clear existing vehicle data before fresh import
+  db.run('DELETE FROM metrics');
+  db.run('DELETE FROM trips');
+  db.run('DELETE FROM vehicles');
 
-  // Clear import completion flag so we'll retry on next startup if it fails
-  setConfigValue('tessie_import_complete', 'false').catch(err => {
-    console.error('Failed to clear import flag:', err);
-  });
-
-  // Only clear data on first setup, not on re-setting the key
-  if (isFirstTimeSetup) {
-    db.run('DELETE FROM metrics');
-    db.run('DELETE FROM trips');
-    db.run('DELETE FROM vehicles');
-  }
-
-  // Start importing Tessie data asynchronously
+  TessieService.clearImportProgress();
   setImmediate(() => {
     TessieService.importTessieData(apiKeyConfig, db).catch(err => {
       console.error('Tessie import error:', err);
     });
   });
 
-  res.json({ message: 'API key configured. Starting Tessie data import...' });
+  res.json({ message: 'API key saved. Starting Tessie data import...' });
+});
+
+// Wipe database and reimport from Tessie (API key file is NOT touched)
+app.post('/api/config/wipe-and-reimport', (req, res) => {
+  if (!apiKeyConfig) {
+    return res.status(400).json({ error: 'No API key configured' });
+  }
+
+  db.run('DELETE FROM metrics');
+  db.run('DELETE FROM trips');
+  db.run('DELETE FROM vehicles');
+
+  TessieService.clearImportProgress();
+  setImmediate(() => {
+    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
+      console.error('Tessie reimport error:', err);
+    });
+  });
+
+  res.json({ message: 'Database wiped. Reimporting from Tessie...' });
 });
 
 // Get import progress
@@ -264,64 +222,28 @@ app.get('/api/import/progress', (req, res) => {
   res.json(progress || { status: 'idle' });
 });
 
-app.post('/api/config/clear-api-key', (req, res) => {
-  apiKeyConfig = null;
-
-  // Clear API key and import flags from database
-  setConfigValue('tessie_api_key', null).catch(err => {
-    console.error('Failed to clear API key:', err);
-  });
-  setConfigValue('tessie_import_complete', 'false').catch(err => {
-    console.error('Failed to clear import flag:', err);
-  });
-
-  // Clear all data
-  db.run('DELETE FROM metrics');
-  db.run('DELETE FROM trips');
-  db.run('DELETE FROM vehicles');
-
-  // Restore mock data
-  initializeMockData();
-
-  res.json({ message: 'API key cleared. Mock data restored.' });
-});
-
 // SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendBuildPath, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3001;
-const server = app.listen(PORT, async () => {
+const server = app.listen(PORT, () => {
   console.log(`Tesla Fleet Monitor API running on port ${PORT}`);
 
-  try {
-    // Load API key from database on startup
-    const savedApiKey = await getConfigValue('tessie_api_key');
-    const importComplete = await getConfigValue('tessie_import_complete');
+  apiKeyConfig = loadApiKey();
 
-    if (savedApiKey && !apiKeyConfig) {
-      apiKeyConfig = savedApiKey;
-      console.log('Loaded API key from database');
-
-      // Always check if we should attempt import
-      // Reset the completion flag and clear old data, then retry
-      console.log('Clearing database and retrying Tessie import...');
-      await setConfigValue('tessie_import_complete', 'false');
-      db.run('DELETE FROM metrics');
-      db.run('DELETE FROM trips');
-      db.run('DELETE FROM vehicles');
-      TessieService.importTessieData(apiKeyConfig, db).catch(err => {
-        console.error('Tessie import error on startup:', err);
-      });
-    } else {
-      // Only initialize mock data if no API key is configured
-      console.log('No API key found, initializing mock data');
-      initializeMockData();
-      console.log('Mock data initialization queued');
-    }
-  } catch (err) {
-    console.error('Startup error:', err);
+  if (apiKeyConfig) {
+    console.log('API key loaded from file. Starting Tessie import...');
+    TessieService.clearImportProgress();
+    db.run('DELETE FROM metrics');
+    db.run('DELETE FROM trips');
+    db.run('DELETE FROM vehicles');
+    TessieService.importTessieData(apiKeyConfig, db).catch(err => {
+      console.error('Tessie import error on startup:', err);
+    });
+  } else {
+    console.log('No API key configured. Add your Tessie API key in Settings.');
   }
 });
 

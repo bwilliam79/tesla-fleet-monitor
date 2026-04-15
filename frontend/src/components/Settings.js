@@ -8,7 +8,6 @@ function Settings({ onClose }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch current API key status
     const fetchStatus = async () => {
       try {
         const res = await axios.get('/api/config/status');
@@ -32,8 +31,7 @@ function Settings({ onClose }) {
       const res = await axios.post('/api/config/api-key', { apiKey: apiKey.trim() });
       setStatus(res.data.message);
       setApiKey('');
-      alert('API Key configured successfully! Mock data has been cleared.');
-      // Reload page to show real data
+      alert('API key saved. Import starting — check back in a moment.');
       setTimeout(() => window.location.reload(), 500);
     } catch (err) {
       alert('Error setting API key: ' + (err.response?.data?.error || err.message));
@@ -42,18 +40,17 @@ function Settings({ onClose }) {
     }
   };
 
-  const handleClearApiKey = async () => {
-    if (!window.confirm('Clear API key and restore mock data?')) return;
+  const handleWipeAndReimport = async () => {
+    if (!window.confirm('Wipe all vehicle data and reimport from Tessie? Your API key will not be affected.')) return;
 
     setLoading(true);
     try {
-      const res = await axios.post('/api/config/clear-api-key');
+      const res = await axios.post('/api/config/wipe-and-reimport');
       setStatus(res.data.message);
-      alert('API key cleared. Mock data has been restored.');
-      // Reload page to show mock data
+      alert('Database wiped. Reimport started — check back in a moment.');
       setTimeout(() => window.location.reload(), 500);
     } catch (err) {
-      alert('Error clearing API key: ' + (err.response?.data?.error || err.message));
+      alert('Error: ' + (err.response?.data?.error || err.message));
     } finally {
       setLoading(false);
     }
@@ -71,8 +68,7 @@ function Settings({ onClose }) {
           <section className="settings-section">
             <h3>Tessie API Configuration</h3>
             <p className="section-description">
-              Connect to your real Tesla vehicles via Tessie. When an API key is provided,
-              mock data will be cleared and replaced with live vehicle data.
+              Connect to your Tesla vehicles via Tessie. Updating the key will clear existing data and trigger a fresh import.
             </p>
 
             <form onSubmit={handleSetApiKey}>
@@ -95,14 +91,6 @@ function Settings({ onClose }) {
                 <button type="submit" disabled={loading} className="primary-button">
                   {loading ? 'Saving...' : 'Set API Key'}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleClearApiKey}
-                  disabled={loading}
-                  className="danger-button"
-                >
-                  Clear & Restore Mock Data
-                </button>
               </div>
             </form>
 
@@ -111,6 +99,23 @@ function Settings({ onClose }) {
                 <strong>Status:</strong> {status}
               </div>
             )}
+          </section>
+
+          <section className="settings-section">
+            <h3>Data Management</h3>
+            <p className="section-description">
+              Wipe all stored vehicle data and reimport fresh from Tessie. Your API key is stored separately and will not be affected.
+            </p>
+            <div className="form-actions">
+              <button
+                type="button"
+                onClick={handleWipeAndReimport}
+                disabled={loading}
+                className="danger-button"
+              >
+                {loading ? 'Working...' : 'Wipe DB & Reimport'}
+              </button>
+            </div>
           </section>
 
           <section className="settings-section">
