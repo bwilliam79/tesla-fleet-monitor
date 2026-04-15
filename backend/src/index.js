@@ -116,19 +116,19 @@ app.get('/api/vehicles/:vehicleId/trips', (req, res) => {
   );
 });
 
-// Get efficiency leaderboard (monthly average)
+// Get efficiency leaderboard (monthly average from trip data)
 app.get('/api/leaderboard/efficiency', (req, res) => {
   const thirtyDaysAgo = Math.floor(Date.now() / 1000) - (30 * 24 * 3600);
 
   db.all(
     `SELECT
        v.id, v.name, v.model,
-       ROUND(AVG(m.efficiency_wh_per_mi), 2) as avg_efficiency,
+       ROUND(AVG(t.efficiency_wh_per_mi), 2) as avg_efficiency,
        COUNT(*) as data_points,
-       MIN(m.timestamp) as first_reading,
-       MAX(m.timestamp) as last_reading
+       MIN(t.start_time) as first_reading,
+       MAX(t.start_time) as last_reading
      FROM vehicles v
-     LEFT JOIN metrics m ON v.id = m.vehicle_id AND m.timestamp >= ?
+     LEFT JOIN trips t ON v.id = t.vehicle_id AND t.start_time >= ?
      GROUP BY v.id
      ORDER BY avg_efficiency ASC`,
     [thirtyDaysAgo],
