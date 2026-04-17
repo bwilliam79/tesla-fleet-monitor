@@ -99,10 +99,9 @@ const TessieService = {
       // Step 1: Get all vehicles
       importProgress = { status: 'fetching_vehicles', message: 'Fetching vehicles from Tessie...' };
       const vehicles = await client.getVehicles();
-      console.log('Vehicles fetched:', vehicles);
+      console.log(`Fetched ${vehicles?.length ?? 0} vehicles from Tessie`);
 
       if (!vehicles || vehicles.length === 0) {
-        console.error('No vehicles found. Raw response was:', vehicles);
         throw new Error('No vehicles found in Tessie account');
       }
 
@@ -111,9 +110,11 @@ const TessieService = {
 
       // Step 2: Import each vehicle and its data (skip inactive vehicles)
       for (const vehicle of vehicles) {
-        // Skip inactive vehicles (is_active: false means archived/inactive)
+        // Skip inactive vehicles (is_active: false means archived/inactive).
+        // Don't log the VIN fallback — VINs uniquely identify a vehicle/owner
+        // and we don't want them persisted in docker logs.
         if (!vehicle.is_active) {
-          console.log(`Skipping inactive vehicle: ${vehicle.display_name || vehicle.vin}`);
+          console.log(`Skipping inactive vehicle: ${vehicle.display_name || '(unnamed)'}`);
           continue;
         }
         vehicleCount++;
@@ -168,12 +169,11 @@ const TessieService = {
           ]
         );
 
-        // Get historical metrics/states (using vehicle.vin)
+        // Get historical metrics/states (using vehicle.vin).
+        // Don't log a raw state sample — individual states include latitude,
+        // longitude, and odometer, all of which are private.
         const history = await client.getVehicleHistory(vehicle.vin);
         console.log(`Got ${history.length} historical states for ${displayName}`);
-        if (history.length > 0) {
-          console.log(`First state sample:`, JSON.stringify(history[0]).substring(0, 200));
-        }
 
         // Insert metrics (Tessie provides battery_level, battery_range, power, inside_temp, etc.)
         let insertedCount = 0;
