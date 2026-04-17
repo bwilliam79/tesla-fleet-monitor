@@ -64,7 +64,15 @@ app.get('/api/vehicles/:vehicleId', (req, res) => {
 
 // Get metrics history for a vehicle
 app.get('/api/vehicles/:vehicleId/metrics', (req, res) => {
-  const hours = req.query.hours;
+  // Clamp hours to a sane ceiling. Without a cap, a huge value flips the
+  // cutoff negative and the timestamp filter becomes a no-op — the query
+  // would scan every row in the metrics table.
+  const MAX_HOURS = 8760; // 1 year
+  const parsed = parseInt(req.query.hours, 10);
+  const hours = Number.isFinite(parsed) && parsed > 0
+    ? Math.min(parsed, MAX_HOURS)
+    : null;
+
   let query = 'SELECT * FROM metrics WHERE vehicle_id = ?';
   let params = [req.params.vehicleId];
 
